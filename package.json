@@ -2,7 +2,7 @@
 	"name": "discord-daily-bot",
 	"version": "0.0.1",
 	"description": "Discord bot for weekly daily",
-	"main": "index.js",
+	"main": "out/index.js",
 	"repository": "git@github.com:jboucly/discord-daily-bot.git",
 	"author": "jboucly <julien.boucly@outlook.com>",
 	"license": "MIT",
@@ -10,7 +10,7 @@
 	"scripts": {
 		"watch": "nodemon",
 		"start": "node index.js",
-		"build": "tsc && mv out/index.js ./",
+		"build": "tsc",
 		"deploy": "yarn build && node out/deploy-commands.js"
 	},
 	"dependencies": {
