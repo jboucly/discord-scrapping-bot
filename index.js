@@ -1,53 +1,78 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.DiscordClient = void 0;
 require("dotenv/config");
 const discord_js_1 = require("discord.js");
-const path_1 = require("path");
-const fs_1 = require("fs");
-const token = process.env.TOKEN || null;
-if (!token)
-    throw new Error('Token is null');
-const collections = new discord_js_1.Collection();
-const client = new discord_js_1.Client({ intents: [discord_js_1.GatewayIntentBits.Guilds] });
-const commandsPath = (0, path_1.join)(__dirname, 'commands');
-const commandFiles = (0, fs_1.readdirSync)(commandsPath).filter((file) => file.endsWith('.js'));
-for (const file of commandFiles) {
-    const filePath = (0, path_1.join)(commandsPath, file);
-    const command = require(filePath);
-    if ('data' in command && 'execute' in command) {
-        collections.set(command.data.name, command);
+const lodash_1 = require("lodash");
+const bot_event_1 = require("./events/bot-event");
+class DiscordClient {
+    constructor() {
+        this.token = process.env.TOKEN || null;
+        this.createClient();
+        this.runBot();
     }
-    else {
-        console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+    createClient() {
+        this.client = new discord_js_1.Client({
+            intents: [
+                discord_js_1.GatewayIntentBits.Guilds,
+                discord_js_1.GatewayIntentBits.GuildBans,
+                discord_js_1.GatewayIntentBits.GuildMessages,
+                discord_js_1.GatewayIntentBits.DirectMessages,
+                discord_js_1.GatewayIntentBits.MessageContent,
+            ],
+        });
+    }
+    runBot() {
+        if ((0, lodash_1.isNil)(this.token))
+            throw new Error('Token is null');
+        new bot_event_1.BotEvent(this.client);
+        this.client.login(this.token);
     }
 }
-// —————— EVENT ——————————————————————————————————————————————————————————————————————————————————————————————————————
-client.once(discord_js_1.Events.ClientReady, (c) => {
-    console.log(`Ready! Logged in as ${c.user.tag}`);
-});
-client.on(discord_js_1.Events.InteractionCreate, (interaction) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!interaction.isChatInputCommand())
-        return;
-    const command = collections.get(interaction.commandName);
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
-    }
-    try {
-        yield command.execute(interaction);
-    }
-    catch (error) {
-        console.error(error);
-        yield interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-    }
-}));
-client.login(token);
+exports.DiscordClient = DiscordClient;
+new DiscordClient();
+// const collections = new Collection();
+// const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+// const commandsPath = join(__dirname, 'commands');
+// const commandFiles = readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
+// for (const file of commandFiles) {
+// 	const filePath = join(commandsPath, file);
+// 	const command = require(filePath);
+// 	if ('data' in command && 'execute' in command) {
+// 		collections.set(command.data.name, command);
+// 	} else {
+// 		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+// 	}
+// }
+// // —————— EVENT ——————————————————————————————————————————————————————————————————————————————————————————————————————
+// client.once(Events.ClientReady, (c) => {
+// 	console.log(`Ready! Logged in as ${c.user.tag}`);
+// });
+// const prefix = '!';
+// client.on('message', function (message) {
+// 	if (message.author.bot) return;
+// 	if (!message.content.startsWith(prefix)) return;
+// 	const commandBody = message.content.slice(prefix.length);
+// 	const args = commandBody.split(' ');
+// 	const command = args.shift().toLowerCase();
+// 	if (command === 'ping') {
+// 		const timeTaken = Date.now() - message.createdTimestamp;
+// 		message.reply(`Pong! This message had a latency of ${timeTaken}ms.`);
+// 	}
+// });
+// // client.on(Events.InteractionCreate, async (interaction) => {
+// // 	console.log('[INTERACTION] - ', interaction);
+// // 	if (!interaction.isChatInputCommand()) return;
+// // 	const command = collections.get(interaction.commandName);
+// // 	if (!command) {
+// // 		console.error(`No command matching ${interaction.commandName} was found.`);
+// // 		return;
+// // 	}
+// // 	try {
+// // 		await (command as any).execute(interaction);
+// // 	} catch (error) {
+// // 		console.error(error);
+// // 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+// // 	}
+// // });
+// client.login(token);
