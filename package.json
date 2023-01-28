@@ -10,15 +10,18 @@
 	"scripts": {
 		"watch": "nodemon",
 		"start": "node index.js",
-		"build": "tsc && mv out/index.js ./"
+		"build": "tsc && mv out/index.js ./",
+		"deploy": "yarn build && node out/deploy-commands.js"
 	},
 	"dependencies": {
 		"discord.js": "^14.7.1",
 		"dotenv": "^16.0.3",
+		"lodash": "^4.17.21",
 		"ts-node": "^10.9.1",
 		"typescript": "^4.9.4"
 	},
 	"devDependencies": {
+		"@types/lodash": "^4.14.191",
 		"nodemon": "^2.0.20"
 	}
 }
