@@ -1,5 +1,5 @@
 import { Client, Collection, Events, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
-import PingCommand from '../commands/ping';
+import PingCommand from '../commands/ping.command';
 
 export class BotCommand {
 	private collection!: Collection<
