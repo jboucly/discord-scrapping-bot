@@ -1,8 +1,8 @@
+import { Client, GatewayIntentBits } from 'discord.js';
 import 'dotenv/config';
-import { Client, Events, GatewayIntentBits } from 'discord.js';
 import { isNil } from 'lodash';
-import { BotEvent } from './events/bot-event';
-import { BotCommand } from './events/bot-command';
+import { BotCommandEvent } from './events/bot-command.event';
+import { BotGlobalEvent } from './events/bot-global.event';
 
 export class DiscordClient {
 	public client!: Client;
@@ -29,8 +29,8 @@ export class DiscordClient {
 	private runBot(): void {
 		if (isNil(this.token)) throw new Error('Token is null');
 
-		new BotEvent(this.client);
-		new BotCommand(this.client);
+		new BotGlobalEvent(this.client);
+		new BotCommandEvent(this.client);
 		this.client.login(this.token);
 	}
 }

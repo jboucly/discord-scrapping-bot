@@ -1,7 +1,7 @@
 import { Client, Collection, Events, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 import PingCommand from '../commands/ping.command';
 
-export class BotCommand {
+export class BotCommandEvent {
 	private collection!: Collection<
 		string,
 		{ data: RESTPostAPIChatInputApplicationCommandsJSONBody; execute: (interaction: any) => Promise<void> }

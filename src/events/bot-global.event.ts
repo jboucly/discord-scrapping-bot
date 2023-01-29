@@ -1,6 +1,6 @@
 import { Client, Events } from 'discord.js';
 
-export class BotEvent {
+export class BotGlobalEvent {
 	public prefix = '/';
 
 	constructor(private client: Client) {
