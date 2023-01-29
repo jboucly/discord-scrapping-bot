@@ -12,7 +12,7 @@ const commandFiles = readdirSync(__dirname + '/commands').filter((file) => file.
 // Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
 for (const file of commandFiles) {
 	const command = require(`${__dirname}/commands/${file}`);
-	commands.push(command.data);
+	commands.push(command.default.data);
 }
 
 // Construct and prepare an instance of the REST module
