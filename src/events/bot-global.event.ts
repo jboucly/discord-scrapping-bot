@@ -3,13 +3,15 @@ import { Client, Events } from 'discord.js';
 export class BotGlobalEvent {
 	public prefix = '/';
 
+	private webhookUrl = process.env.WEBHOOK_URL || null;
+
 	constructor(private client: Client) {
 		this.setEventOnRunBot();
 		this.setPingEvent();
 	}
 
 	private setEventOnRunBot(): void {
-		this.client.once(Events.ClientReady, (c) => {
+		this.client.once(Events.ClientReady, async (c) => {
 			console.log(`Ready! Logged in as ${c.user.tag}`);
 		});
 	}
