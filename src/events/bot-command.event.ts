@@ -1,5 +1,5 @@
 import { Client, Collection, Events, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
-import PingCommand from '../commands/ping.command';
+import { Commands } from '../commands';
 
 export class BotCommandEvent {
 	private collection!: Collection<
@@ -15,11 +15,9 @@ export class BotCommandEvent {
 	private setCollection(): void {
 		this.collection = new Collection();
 
-		if ('data' in PingCommand && 'execute' in PingCommand) {
-			this.collection.set(PingCommand.data.name, PingCommand);
-		} else {
-			console.log(`[WARNING] The command at ${PingCommand} is missing a required "data" or "execute" property.`);
-		}
+		Commands.forEach((c) => {
+			this.collection.set(c.data.name, c);
+		});
 	}
 
 	private setCommandEvent(): void {
