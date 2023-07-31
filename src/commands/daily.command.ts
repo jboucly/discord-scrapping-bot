@@ -1,7 +1,10 @@
-import { format } from 'date-fns';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { CronJob } from 'cron';
+import { ChatInputCommandInteraction, Client, SlashCommandBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
 import { DailyOptions } from '../enums/daily-option.enum';
+import JsonStorage from '../shared/services/json-storage.service';
+import { CommandOptionsUtils } from '../shared/utils/command-options.utils';
+import { DateUtils } from '../shared/utils/date.utils';
 
 const dailyCommand = {
 	data: new SlashCommandBuilder()
@@ -13,20 +16,54 @@ const dailyCommand = {
 				.setName(DailyOptions.HOUR)
 				.setDescription('Save the time you want to have the daily. In the format: hh:mm')
 		)
+		.addStringOption((opts) =>
+			opts
+				.setRequired(true)
+				.setName(DailyOptions.MESSAGE)
+				.setDescription('Save the message you want to receive in the daily')
+		)
+		.addChannelOption((opts) =>
+			opts
+				.setRequired(true)
+				.setName(DailyOptions.CHANNEL)
+				.setDescription('Save the channel you want to receive the daily')
+		)
 		.toJSON(),
-	async execute(interaction: ChatInputCommandInteraction) {
-		const optHour = interaction.options.data.find((e) => e.name === DailyOptions.HOUR);
-		console.log(optHour);
+	async execute(interaction: ChatInputCommandInteraction, client: Client) {
+		const optHour = CommandOptionsUtils.getRequired(interaction, DailyOptions.HOUR);
+		const optChannel = CommandOptionsUtils.getRequired(interaction, DailyOptions.CHANNEL);
+		const optMessage = CommandOptionsUtils.getRequired(interaction, DailyOptions.MESSAGE);
 
-		if (isNil(optHour) || isNil(optHour.value) || !(optHour.value as string).includes(':')) {
-			await interaction.reply('❌ The time format is not correct ❌');
+		if (isNil(optHour) || isNil(optHour.value) || !DateUtils.isTimeFormatCorrect(optHour.value as string)) {
+			await interaction.reply('❌ The time format is not correct ❌ \n \r ➡️ The correct format is: hh:mm');
 			return;
 		}
 
-		const time = format(new Date(), 'hh:mm');
-		console.log(time);
+		const crontab = (optHour.value as string).split(':');
+		const storage = new JsonStorage('daily.json');
 
-		await interaction.reply('WIP');
+		const daily = {
+			time: `00 ${crontab[1]} ${crontab[0]} * * *`,
+			channel: optChannel.value as string,
+			message: optMessage.value as string,
+		};
+
+		storage.set('cron', daily, { isArray: true });
+
+		const cron = new CronJob(daily.time, async () => {
+			const channel = client.channels.cache.find((channel: any) => channel.id === daily.channel) as TextChannel;
+
+			if (isNil(channel)) {
+				console.error('Channel not found');
+				return;
+			}
+
+			await channel.send(daily.message);
+		});
+
+		cron.start();
+
+		await interaction.reply('✅ Daily configured');
 	},
 };
 

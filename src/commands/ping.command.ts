@@ -1,8 +1,8 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { Client, SlashCommandBuilder } from 'discord.js';
 
 const pingCommand = {
 	data: new SlashCommandBuilder().setName('ping').setDescription('Replies with Pong!').toJSON(),
-	async execute(interaction: any) {
+	async execute(interaction: any, client: Client) {
 		await interaction.reply('Pong!');
 	},
 };

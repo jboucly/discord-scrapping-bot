@@ -1,10 +1,14 @@
 import { Client, Collection, Events, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 import { Commands } from '../commands';
+import { DailyCommandService } from '../shared/services/daily-command.service';
 
 export class BotCommandEvent {
 	private collection!: Collection<
 		string,
-		{ data: RESTPostAPIChatInputApplicationCommandsJSONBody; execute: (interaction: any) => Promise<void> }
+		{
+			data: RESTPostAPIChatInputApplicationCommandsJSONBody;
+			execute: (interaction: any, client: Client) => Promise<void>;
+		}
 	>;
 
 	constructor(private client: Client) {
@@ -17,6 +21,11 @@ export class BotCommandEvent {
 
 		Commands.forEach((c) => {
 			this.collection.set(c.data.name, c);
+
+			// If the command is daily, start the cron jobs
+			if (c.data.name === 'daily') {
+				DailyCommandService.startCronJobs(this.client);
+			}
 		});
 	}
 
@@ -31,7 +40,7 @@ export class BotCommandEvent {
 			}
 
 			try {
-				await (command as any).execute(interaction);
+				await (command as any).execute(interaction, this.client);
 			} catch (error) {
 				console.error(error);
 				await interaction.reply({
