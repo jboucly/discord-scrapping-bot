@@ -3,6 +3,7 @@ import { ChatInputCommandInteraction, Client, SlashCommandBuilder, TextChannel }
 import { isNil } from 'lodash';
 import { DailyOptions } from '../enums/daily-option.enum';
 import JsonStorage from '../shared/services/json-storage.service';
+import { Daily } from '../shared/types/daily.types';
 import { CommandOptionsUtils } from '../shared/utils/command-options.utils';
 import { DateUtils } from '../shared/utils/date.utils';
 
@@ -30,6 +31,7 @@ const dailyCommand = {
 		)
 		.toJSON(),
 	async execute(interaction: ChatInputCommandInteraction, client: Client) {
+		let isUpdated = false;
 		const optHour = CommandOptionsUtils.getRequired(interaction, DailyOptions.HOUR);
 		const optChannel = CommandOptionsUtils.getRequired(interaction, DailyOptions.CHANNEL);
 		const optMessage = CommandOptionsUtils.getRequired(interaction, DailyOptions.MESSAGE);
@@ -48,7 +50,17 @@ const dailyCommand = {
 			message: optMessage.value as string,
 		};
 
-		storage.set('cron', daily, { isArray: true });
+		const res = (storage.get('cron') as Daily[]).find((d) => d.time === daily.time);
+
+		if (!isNil(res)) {
+			isUpdated = true;
+			const allDaily = storage.get('cron') as Daily[];
+			const index = allDaily.findIndex((d) => d.time === daily.time);
+			allDaily[index] = daily;
+			storage.update('cron', daily);
+		} else {
+			storage.set('cron', daily, { isArray: true });
+		}
 
 		const cron = new CronJob(daily.time, async () => {
 			const channel = client.channels.cache.find((channel: any) => channel.id === daily.channel) as TextChannel;
@@ -63,7 +75,7 @@ const dailyCommand = {
 
 		cron.start();
 
-		await interaction.reply('✅ Daily configured');
+		await interaction.reply(isUpdated ? '✅ Daily updated' : '✅ Daily configured');
 	},
 };
 
