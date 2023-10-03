@@ -1,8 +1,6 @@
 import { Client, Events } from 'discord.js';
 
 export class BotGlobalEvent {
-	public prefix = '/';
-
 	private webhookUrl = process.env.WEBHOOK_URL || null;
 
 	constructor(private client: Client) {
@@ -23,13 +21,10 @@ export class BotGlobalEvent {
 	private setPingEvent(): void {
 		this.client.on('messageCreate', (message) => {
 			if (message.author.bot) return;
-			if (!message.content.startsWith(this.prefix)) return;
 
-			const commandBody = message.content.slice(this.prefix.length);
-			const args = commandBody.split(' ');
-			const command = (args.shift() as string).toLowerCase();
+			const commandBody = message.content.includes('ping');
 
-			if (command === 'ping') {
+			if (commandBody) {
 				const timeTaken = Date.now() - message.createdTimestamp;
 				message.reply(`Pong! This message had a latency of ${timeTaken}ms.`);
 			}
