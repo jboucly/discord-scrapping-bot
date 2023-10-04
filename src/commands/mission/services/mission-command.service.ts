@@ -35,43 +35,47 @@ export class MissionCommandService {
 		const embedMessages = this.createEmbeds(allMissions);
 		const allMissionSearch = this.storage.get(MissionStorage.NOTIFICATIONS) as MissionNotificationSaved[];
 
-		for (let i = 0; i < allMissionSearch.length; i++) {
-			const missionSearch = allMissionSearch[i];
+		if (!isNil(allMissionSearch)) {
+			for (let i = 0; i < allMissionSearch.length; i++) {
+				const missionSearch = allMissionSearch[i];
 
-			const channel = client.channels.cache.find(
-				(channel: any) => channel.id === missionSearch.channel
-			) as TextChannel;
+				const channel = client.channels.cache.find(
+					(channel: any) => channel.id === missionSearch.channel
+				) as TextChannel;
 
-			if (isNil(channel)) {
-				console.error('Channel not found');
-				return;
-			}
+				if (isNil(channel)) {
+					console.error('Channel not found');
+					return;
+				}
 
-			if (embedMessages.length > 10) {
-				let messageToSend = embedMessages;
+				if (embedMessages.length > 10) {
+					let messageToSend = embedMessages;
 
-				while (messageToSend.length > 0) {
-					console.log(messageToSend.length);
+					while (messageToSend.length > 0) {
+						console.log(messageToSend.length);
 
+						await channel.send({
+							embeds: messageToSend.splice(0, 10),
+							content: 'Nouvelle mission disponible ! 🚀',
+						});
+					}
+				} else if (embedMessages.length > 0) {
 					await channel.send({
-						embeds: messageToSend.splice(0, 10),
+						embeds: embedMessages,
 						content: 'Nouvelle mission disponible ! 🚀',
 					});
 				}
-			} else if (embedMessages.length > 0) {
-				await channel.send({
-					embeds: embedMessages,
-					content: 'Nouvelle mission disponible ! 🚀',
-				});
-			}
 
-			console.info(`ℹ️  ${embedMessages.length} missions notification send to ${channel.name} : ${channel.id}`);
-
-			if (allMissions.length > 0) {
-				this.storage.update(
-					MissionStorage.MISSION_ID_SENDED,
-					allMissions.map((m) => m.id)
+				console.info(
+					`ℹ️  ${embedMessages.length} missions notification send to ${channel.name} : ${channel.id}`
 				);
+
+				if (allMissions.length > 0) {
+					this.storage.update(
+						MissionStorage.MISSION_ID_SENDED,
+						allMissions.map((m) => m.id)
+					);
+				}
 			}
 		}
 	}
