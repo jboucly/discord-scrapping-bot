@@ -2,6 +2,7 @@ import { CronJob } from 'cron';
 import { format } from 'date-fns';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
+import fetch from 'node-fetch';
 import JsonStorage from '../../../common/services/json-storage.service';
 import { MissionStorage } from '../enums/mission-storage.enum';
 import { MissionNotificationSaved } from '../interfaces/mission-notification-saved.interface';
