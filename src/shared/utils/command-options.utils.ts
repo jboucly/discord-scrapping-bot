@@ -1,7 +1,7 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, CommandInteractionOption } from 'discord.js';
 
 export const CommandOptionsUtils = {
-	getRequired(interaction: ChatInputCommandInteraction, name: string) {
+	getRequired(interaction: ChatInputCommandInteraction, name: string): CommandInteractionOption {
 		const opts = interaction.options.data.find((e) => e.name === name);
 
 		if (!opts) {
@@ -9,5 +9,9 @@ export const CommandOptionsUtils = {
 		}
 
 		return opts;
+	},
+
+	getNotRequired(interaction: ChatInputCommandInteraction, name: string): CommandInteractionOption | undefined {
+		return interaction.options.data.find((e) => e.name === name);
 	},
 };
