@@ -1,8 +1,10 @@
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
-import { includes, isArray, isNil } from 'lodash';
+import { isArray, isNil, uniqBy } from 'lodash';
 import JsonStorage from '../../common/services/json-storage.service';
 import { CommandOptionsUtils } from '../../common/utils/command-options.utils';
 import { MissionOptions } from './enums/mission-option.enum';
+import { MissionStorage } from './enums/mission-storage.enum';
+import { Mission } from './interfaces/mission.interface';
 
 function getWords(words: string): string[] | string {
 	if (words.includes(',') || words.includes(' ')) {
@@ -12,8 +14,22 @@ function getWords(words: string): string[] | string {
 	return words;
 }
 
-function removeDuplicate(words: string[], newWords: string[]): string[] {
-	return [...newWords.filter((w) => !includes(words, w)), ...words];
+function removeDuplicate(words: Mission[], newWords: string[], channel: string): Mission[] {
+	const exist = words.find((w) => w.channel === channel);
+
+	if (exist) {
+		const uniqWords = uniqBy([...newWords, ...exist.words], 'channel');
+
+		return words.map((w) => {
+			if (w.channel === channel) {
+				w.words = uniqWords;
+			}
+
+			return w;
+		});
+	}
+
+	return [...words, { channel, words: newWords }];
 }
 
 const MissionCommand = {
@@ -32,14 +48,24 @@ const MissionCommand = {
 		const optEnabled = CommandOptionsUtils.getRequired(interaction, MissionOptions.ENABLED);
 		const optWords = CommandOptionsUtils.getNotRequired(interaction, MissionOptions.WORDS);
 
+		const channel = interaction.channel;
+		if (isNil(channel)) throw new Error('Channel not found');
+
 		const storage = new JsonStorage('mission.json');
-		const alreadyExist = storage.get('words') as string[];
+		const alreadyExist = storage.get(MissionStorage.DATA) as Mission[];
 
 		if (optEnabled.value === false) {
 			if (!isNil(alreadyExist)) {
-				storage.delete('words');
+				alreadyExist.forEach((mission) => {
+					if (mission.channel === channel.id) {
+						storage.update(
+							MissionStorage.DATA,
+							alreadyExist.filter((r) => r.channel !== mission.channel)
+						);
+					}
+				});
 			}
-			await interaction.reply('🚀 Notification mission disabled');
+			await interaction.reply('🚀 Notification mission removed');
 			return;
 		} else if (isNil(optWords)) {
 			await interaction.reply('🚀 Please input keyword');
@@ -49,12 +75,15 @@ const MissionCommand = {
 				const newWords = getWords(optWords.value as string);
 
 				if (isArray(newWords)) {
-					storage.update('words', removeDuplicate(alreadyExist, newWords));
+					storage.update(MissionStorage.DATA, removeDuplicate(alreadyExist, newWords, channel.id));
 				} else {
-					storage.update('words', [newWords, ...alreadyExist.filter((r) => r !== newWords)] as string[]);
+					storage.update(MissionStorage.DATA, [
+						...alreadyExist.filter((r) => r.channel !== channel.id),
+						{ channel: channel.id, words: newWords },
+					]);
 				}
 			} else {
-				storage.set('words', [optWords.value]);
+				storage.set(MissionStorage.DATA, [{ channel: channel.id, words: [optWords.value as string] }]);
 			}
 
 			await interaction.reply('🚀 Notification mission enabled');
