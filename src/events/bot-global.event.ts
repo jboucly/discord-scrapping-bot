@@ -1,8 +1,6 @@
 import { Client, Events } from 'discord.js';
 
 export class BotGlobalEvent {
-	private webhookUrl = process.env.WEBHOOK_URL || null;
-
 	constructor(private client: Client) {
 		this.setEventOnRunBot();
 		this.setPingEvent();
