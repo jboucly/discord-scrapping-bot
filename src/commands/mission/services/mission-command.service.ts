@@ -52,8 +52,6 @@ export class MissionCommandService {
 					let messageToSend = embedMessages;
 
 					while (messageToSend.length > 0) {
-						console.log(messageToSend.length);
-
 						await channel.send({
 							embeds: messageToSend.splice(0, 10),
 							content: 'Nouvelle mission disponible ! 🚀',
