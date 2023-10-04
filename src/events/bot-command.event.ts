@@ -1,6 +1,6 @@
 import { Client, Collection, Events, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 import { Commands } from '../commands';
-import { DailyCommandService } from '../shared/services/daily-command.service';
+import { DailyCommandService } from '../commands/daily/services/daily-command.service';
 
 export class BotCommandEvent {
 	private collection!: Collection<

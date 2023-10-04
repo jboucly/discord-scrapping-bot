@@ -1,11 +1,11 @@
 import { CronJob } from 'cron';
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
-import { DailyOptions } from '../enums/daily-option.enum';
-import JsonStorage from '../shared/services/json-storage.service';
-import { Daily } from '../shared/types/daily.types';
-import { CommandOptionsUtils } from '../shared/utils/command-options.utils';
-import { DateUtils } from '../shared/utils/date.utils';
+import JsonStorage from '../../common/services/json-storage.service';
+import { CommandOptionsUtils } from '../../common/utils/command-options.utils';
+import { DateUtils } from '../../common/utils/date.utils';
+import { DailyOptions } from './enums/daily-option.enum';
+import { Daily } from './types/daily.types';
 
 const dailyCommand = {
 	data: new SlashCommandBuilder()

@@ -1,14 +1,14 @@
 import { CronJob } from 'cron';
 import { Client, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
-import { Daily } from '../types/daily.types';
-import JsonStorage from './json-storage.service';
+import JsonStorage from '../../../common/services/json-storage.service';
+import { Daily } from '../../daily/types/daily.types';
+import { MissionOptions } from '../enums/mission-option.enum';
 
-export class DailyCommandService {
+export class MissionCommandService {
 	public static startCronJobs(client: Client): void {
-		const storage = new JsonStorage('daily.json');
-
-		const cronData = storage.get('cron');
+		const storage = new JsonStorage('mission.json');
+		const cronData = storage.get(MissionOptions.WORDS);
 
 		if (!isNil(cronData)) {
 			cronData.forEach((daily: Daily) => {
@@ -27,8 +27,8 @@ export class DailyCommandService {
 
 				cron.start();
 			});
-		}
 
-		console.info('ℹ️  Cron jobs started\n');
+			console.info('ℹ️  Mission cron jobs started\n');
+		}
 	}
 }

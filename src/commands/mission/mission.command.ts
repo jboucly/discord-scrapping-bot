@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
 import { includes, isArray, isNil } from 'lodash';
-import { MissionOptions } from '../enums/mission-option.enum';
-import JsonStorage from '../shared/services/json-storage.service';
-import { CommandOptionsUtils } from '../shared/utils/command-options.utils';
+import JsonStorage from '../../common/services/json-storage.service';
+import { CommandOptionsUtils } from '../../common/utils/command-options.utils';
+import { MissionOptions } from './enums/mission-option.enum';
 
 function getWords(words: string): string[] | string {
 	if (words.includes(',') || words.includes(' ')) {
