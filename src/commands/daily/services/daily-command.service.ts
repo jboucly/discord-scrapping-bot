@@ -28,7 +28,7 @@ export class DailyCommandService {
 				cron.start();
 			});
 
-			console.info('ℹ️  Daily Cron jobs started\n');
+			console.info('ℹ️  Daily Cron jobs started');
 		}
 	}
 }

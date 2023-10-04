@@ -1,10 +1,10 @@
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
-import { isArray, isNil, uniqBy } from 'lodash';
+import { isArray, isNil, uniq } from 'lodash';
 import JsonStorage from '../../common/services/json-storage.service';
 import { CommandOptionsUtils } from '../../common/utils/command-options.utils';
 import { MissionOptions } from './enums/mission-option.enum';
 import { MissionStorage } from './enums/mission-storage.enum';
-import { Mission } from './interfaces/mission.interface';
+import { MissionNotificationSaved } from './interfaces/mission-notification-saved.interface';
 
 function getWords(words: string): string[] | string {
 	if (words.includes(',') || words.includes(' ')) {
@@ -14,11 +14,15 @@ function getWords(words: string): string[] | string {
 	return words;
 }
 
-function removeDuplicate(words: Mission[], newWords: string[], channel: string): Mission[] {
+function removeDuplicate(
+	words: MissionNotificationSaved[],
+	newWords: string[],
+	channel: string
+): MissionNotificationSaved[] {
 	const exist = words.find((w) => w.channel === channel);
 
 	if (exist) {
-		const uniqWords = uniqBy([...newWords, ...exist.words], 'channel');
+		const uniqWords = uniq([...newWords, ...exist.words]);
 
 		return words.map((w) => {
 			if (w.channel === channel) {
@@ -35,7 +39,7 @@ function removeDuplicate(words: Mission[], newWords: string[], channel: string):
 const MissionCommand = {
 	data: new SlashCommandBuilder()
 		.setName('mission')
-		.setDescription('Configure your mission notification')
+		.setDescription('Configure your mission notification. If you search freelancer job, you can use this ! 🔥')
 		.addBooleanOption((opts) =>
 			opts
 				.setRequired(true)
@@ -52,14 +56,14 @@ const MissionCommand = {
 		if (isNil(channel)) throw new Error('Channel not found');
 
 		const storage = new JsonStorage('mission.json');
-		const alreadyExist = storage.get(MissionStorage.DATA) as Mission[];
+		const alreadyExist = storage.get(MissionStorage.NOTIFICATIONS) as MissionNotificationSaved[];
 
 		if (optEnabled.value === false) {
 			if (!isNil(alreadyExist)) {
 				alreadyExist.forEach((mission) => {
 					if (mission.channel === channel.id) {
 						storage.update(
-							MissionStorage.DATA,
+							MissionStorage.NOTIFICATIONS,
 							alreadyExist.filter((r) => r.channel !== mission.channel)
 						);
 					}
@@ -75,15 +79,15 @@ const MissionCommand = {
 				const newWords = getWords(optWords.value as string);
 
 				if (isArray(newWords)) {
-					storage.update(MissionStorage.DATA, removeDuplicate(alreadyExist, newWords, channel.id));
+					storage.update(MissionStorage.NOTIFICATIONS, removeDuplicate(alreadyExist, newWords, channel.id));
 				} else {
-					storage.update(MissionStorage.DATA, [
+					storage.update(MissionStorage.NOTIFICATIONS, [
 						...alreadyExist.filter((r) => r.channel !== channel.id),
 						{ channel: channel.id, words: newWords },
 					]);
 				}
 			} else {
-				storage.set(MissionStorage.DATA, [{ channel: channel.id, words: [optWords.value as string] }]);
+				storage.set(MissionStorage.NOTIFICATIONS, [{ channel: channel.id, words: [optWords.value as string] }]);
 			}
 
 			await interaction.reply('🚀 Notification mission enabled');

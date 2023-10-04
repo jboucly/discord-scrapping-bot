@@ -26,12 +26,12 @@ export class DiscordClient {
 		});
 	}
 
-	private runBot(): void {
+	private async runBot(): Promise<void> {
 		if (isNil(this.token)) throw new Error('Token is null');
 
+		await this.client.login(this.token);
 		new BotGlobalEvent(this.client);
 		new BotCommandEvent(this.client);
-		this.client.login(this.token);
 	}
 }
 

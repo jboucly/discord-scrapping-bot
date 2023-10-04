@@ -1,34 +1,137 @@
 import { CronJob } from 'cron';
-import { Client, TextChannel } from 'discord.js';
+import { format } from 'date-fns';
+import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
 import JsonStorage from '../../../common/services/json-storage.service';
-import { Daily } from '../../daily/types/daily.types';
-import { MissionOptions } from '../enums/mission-option.enum';
+import { MissionStorage } from '../enums/mission-storage.enum';
+import { MissionNotificationSaved } from '../interfaces/mission-notification-saved.interface';
+import { MissionNotification } from '../interfaces/mission-notification.interface';
+import { PyloteJobs } from '../interfaces/pylote-jobs.interface';
 
 export class MissionCommandService {
-	public static startCronJobs(client: Client): void {
-		const storage = new JsonStorage('mission.json');
-		const cronData = storage.get(MissionOptions.WORDS);
+	private storage = new JsonStorage('mission.json');
 
-		if (!isNil(cronData)) {
-			cronData.forEach((daily: Daily) => {
-				const cron = new CronJob(daily.time, () => {
-					const channel = client.channels.cache.find(
-						(channel: any) => channel.id === daily.channel
-					) as TextChannel;
+	public async startCronJobs(client: Client): Promise<void> {
+		const crontab = process.env.MISSION_CRON;
+		if (isNil(crontab)) throw new Error('Crontab for mission not found');
 
-					if (isNil(channel)) {
-						console.error('Channel not found');
-						return;
-					}
+		const cron = new CronJob(crontab, async () => {
+			await this.sendMissionNotification(client);
+		});
 
-					channel.send(daily.message);
-				});
+		cron.start();
+		console.info('ℹ️  Mission Cron jobs started');
+	}
 
-				cron.start();
-			});
+	public async sendMissionNotification(client: Client): Promise<void> {
+		let allMissions: MissionNotification[] = [...(await this.getPyloteMission())];
+		const missionAlreadySend = this.storage.get(MissionStorage.MISSION_ID_SENDED) as string[];
 
-			console.info('ℹ️  Mission cron jobs started\n');
+		if (!isNil(missionAlreadySend)) {
+			allMissions = allMissions.filter((m) => !missionAlreadySend.includes(m.id));
 		}
+
+		const embedMessages = this.createEmbeds(allMissions);
+		const allMissionSearch = this.storage.get(MissionStorage.NOTIFICATIONS) as MissionNotificationSaved[];
+
+		for (let i = 0; i < allMissionSearch.length; i++) {
+			const missionSearch = allMissionSearch[i];
+
+			const channel = client.channels.cache.find(
+				(channel: any) => channel.id === missionSearch.channel
+			) as TextChannel;
+
+			if (isNil(channel)) {
+				console.error('Channel not found');
+				return;
+			}
+
+			if (embedMessages.length > 10) {
+				let messageToSend = embedMessages;
+
+				while (messageToSend.length > 0) {
+					console.log(messageToSend.length);
+
+					await channel.send({
+						embeds: messageToSend.splice(0, 10),
+						content: 'Nouvelle mission disponible ! 🚀',
+					});
+				}
+			} else if (embedMessages.length > 0) {
+				await channel.send({
+					embeds: embedMessages,
+					content: 'Nouvelle mission disponible ! 🚀',
+				});
+			}
+
+			console.info(`ℹ️  ${embedMessages.length} missions notification send to ${channel.name} : ${channel.id}`);
+
+			if (allMissions.length > 0) {
+				this.storage.update(
+					MissionStorage.MISSION_ID_SENDED,
+					allMissions.map((m) => m.id)
+				);
+			}
+		}
+	}
+
+	private async getPyloteMission(): Promise<MissionNotification[]> {
+		const valToReturn: MissionNotification[] = [];
+
+		const allMissionSearch = this.storage.get(MissionStorage.NOTIFICATIONS) as MissionNotificationSaved[];
+
+		if (!isNil(process.env.PYLOTE_URL)) {
+			const response = await fetch(process.env.PYLOTE_URL);
+			const jobs = (await response.json()) as PyloteJobs[];
+
+			for (let i = 0; i < jobs.length; i++) {
+				const job = jobs[i];
+
+				for (let i = 0; i < allMissionSearch.length; i++) {
+					const missionSearch = allMissionSearch[i];
+
+					if (
+						missionSearch.words.find((w) => job.Title.toLocaleLowerCase().includes(w.toLocaleLowerCase()))
+					) {
+						valToReturn.push({
+							id: job.id,
+							name: job.Title,
+							url: job.URL,
+							date: job.Date,
+							city: job.Ville,
+							platform: job.Plateforme,
+							durationMonth: job.Durée_mois,
+						});
+					}
+				}
+			}
+		}
+
+		return valToReturn;
+	}
+
+	private createEmbeds(missions: MissionNotification[]): EmbedBuilder[] {
+		const valToReturn: EmbedBuilder[] = [];
+
+		for (let i = 0; i < missions.length; i++) {
+			const mission = missions[i];
+
+			valToReturn.push(
+				new EmbedBuilder()
+					.setColor('#FF0000')
+					.setTitle(`➡️ ${mission.name}`)
+					.setURL(mission.url)
+					.setDescription('ℹ️ Informations :')
+					.setFields([
+						{ name: 'Durée', value: `${mission.durationMonth} mois`, inline: true },
+						{ name: 'Ville', value: `${mission.city}`, inline: true },
+						{ name: 'Plateforme', value: `${mission.platform}`, inline: true },
+						{ name: 'Date', value: `${format(new Date(mission.date), 'dd/MM/yyyy')}`, inline: true },
+					])
+					.setTimestamp()
+			);
+		}
+
+		return valToReturn;
 	}
 }

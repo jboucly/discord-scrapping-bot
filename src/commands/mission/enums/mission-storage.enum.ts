@@ -1,3 +1,4 @@
 export enum MissionStorage {
-	DATA = 'data',
+	NOTIFICATIONS = 'notifications',
+	MISSION_ID_SENDED = 'missionIdSended',
 }
