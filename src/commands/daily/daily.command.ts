@@ -50,7 +50,7 @@ const dailyCommand = {
 			message: optMessage.value as string,
 		};
 
-		const res = (storage.get('cron', true) as Daily[]).find((d) => d.time === daily.time);
+		const res = (storage.get('cron', true) as Daily[])?.find((d) => d.time === daily.time);
 
 		if (!isNil(res)) {
 			isUpdated = true;
