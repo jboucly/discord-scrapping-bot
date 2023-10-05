@@ -8,7 +8,7 @@ export class DailyCommandService {
 	public static startCronJobs(client: Client): void {
 		const storage = new JsonStorage('daily.json');
 
-		const cronData = storage.get('cron');
+		const cronData = storage.get('cron', true);
 
 		if (!isNil(cronData)) {
 			cronData.forEach((daily: Daily) => {

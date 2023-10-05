@@ -56,7 +56,7 @@ const MissionCommand = {
 		if (isNil(channel)) throw new Error('Channel not found');
 
 		const storage = new JsonStorage('mission.json');
-		const alreadyExist = storage.get(MissionStorage.NOTIFICATIONS) as MissionNotificationSaved[];
+		const alreadyExist = storage.get(MissionStorage.NOTIFICATIONS, true) as MissionNotificationSaved[];
 
 		if (optEnabled.value === false) {
 			if (!isNil(alreadyExist)) {
