@@ -54,7 +54,7 @@ const dailyCommand = {
 
 		if (!isNil(res)) {
 			isUpdated = true;
-			const allDaily = storage.get('cron') as Daily[];
+			const allDaily = storage.get('cron', true) as Daily[];
 			const index = allDaily.findIndex((d) => d.time === daily.time);
 			allDaily[index] = daily;
 			storage.update('cron', allDaily);
