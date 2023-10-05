@@ -89,7 +89,7 @@ export class MissionCommandService {
 
 		const allMissionSearch = this.storage.get(MissionStorage.NOTIFICATIONS) as MissionNotificationSaved[];
 
-		if (!isNil(process.env.PYLOTE_URL)) {
+		if (!isNil(process.env.PYLOTE_URL) && !isNil(allMissionSearch)) {
 			const response = await fetch(process.env.PYLOTE_URL);
 			const jobs = (await response.json()) as PyloteJobs[];
 
