@@ -26,14 +26,14 @@ export class MissionCommandService {
 
 	public async sendMissionNotification(client: Client): Promise<void> {
 		let allMissions: MissionNotification[] = [...(await this.getPyloteMission())];
-		const missionAlreadySend = this.storage.get(MissionStorage.MISSION_ID_SENDED) as string[];
+		const missionAlreadySend = this.storage.get(MissionStorage.MISSION_ID_SENDED, true) as string[];
 
 		if (!isNil(missionAlreadySend)) {
 			allMissions = allMissions.filter((m) => !missionAlreadySend.includes(m.id));
 		}
 
 		const embedMessages = this.createEmbeds(allMissions);
-		const allMissionSearch = this.storage.get(MissionStorage.NOTIFICATIONS) as MissionNotificationSaved[];
+		const allMissionSearch = this.storage.get(MissionStorage.NOTIFICATIONS, true) as MissionNotificationSaved[];
 
 		if (!isNil(allMissionSearch)) {
 			for (let i = 0; i < allMissionSearch.length; i++) {
@@ -87,7 +87,7 @@ export class MissionCommandService {
 	private async getPyloteMission(): Promise<MissionNotification[]> {
 		const valToReturn: MissionNotification[] = [];
 
-		const allMissionSearch = this.storage.get(MissionStorage.NOTIFICATIONS) as MissionNotificationSaved[];
+		const allMissionSearch = this.storage.get(MissionStorage.NOTIFICATIONS, true) as MissionNotificationSaved[];
 
 		if (!isNil(process.env.PYLOTE_URL) && !isNil(allMissionSearch)) {
 			const response = await fetch(process.env.PYLOTE_URL);

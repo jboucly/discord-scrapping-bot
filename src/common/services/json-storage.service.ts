@@ -12,11 +12,14 @@ class JsonStorage {
 		this.fileName = fileName;
 	}
 
-	private readData(): Data {
+	private readData(create?: boolean): Data {
 		try {
 			const data = fs.readFileSync(join('data', this.fileName), 'utf-8');
 			return JSON.parse(data);
 		} catch (error) {
+			if (!create) throw new Error(`File ${this.fileName} not found`);
+			fs.writeFileSync(join('data', this.fileName), '{}', 'utf-8');
+			console.info(`ℹ️  File ${this.fileName} created`);
 			return {};
 		}
 	}
@@ -38,8 +41,8 @@ class JsonStorage {
 		this.writeData(data);
 	}
 
-	public get(key: string): Record<string, any> | null {
-		const data = this.readData();
+	public get(key: string, override?: boolean): Record<string, any> | null {
+		const data = this.readData(override);
 		return data.hasOwnProperty(key) ? data[key] : null;
 	}
 
