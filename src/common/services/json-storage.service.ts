@@ -51,9 +51,12 @@ class JsonStorage {
 		}
 	}
 
-	public update(key: string, value: any): void {
+	public update(key: string, value: any, override?: boolean): void {
 		const data = this.readData();
 		if (data.hasOwnProperty(key)) {
+			data[key] = value;
+			this.writeData(data);
+		} else if (override) {
 			data[key] = value;
 			this.writeData(data);
 		}

@@ -65,13 +65,19 @@ export class MissionCommandService {
 				}
 
 				console.info(
-					`ℹ️  ${embedMessages.length} missions notification send to ${channel.name} : ${channel.id}`
+					`ℹ️  ${embedMessages.length} missions notification send to ${channel.name}: ${
+						channel.id
+					}\n⏰ ${format(
+						new Date(),
+						'dd/MM/yyyy HH:mm'
+					)}\n———————————————————————————————————————————————————————————`
 				);
 
 				if (allMissions.length > 0) {
 					this.storage.update(
 						MissionStorage.MISSION_ID_SENDED,
-						allMissions.map((m) => m.id)
+						allMissions.map((m) => m.id),
+						true
 					);
 				}
 			}
