@@ -80,7 +80,9 @@ export class MissionCommandService {
 				if (allMissions.length > 0) {
 					this.storage.update(
 						MissionStorage.MISSION_ID_SENDED,
-						[...allMissions.map((m) => m.id), ...missionAlreadySend],
+						!isNil(missionAlreadySend) && missionAlreadySend.length > 0
+							? [...allMissions.map((m) => m.id), ...missionAlreadySend]
+							: allMissions.map((m) => m.id),
 						true
 					);
 				}
