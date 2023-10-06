@@ -28,7 +28,7 @@ const MissionListCommand = {
 		const prisma = new PrismaService();
 		const alreadyExist = await prisma.missions.findMany();
 
-		if (isNil(alreadyExist)) {
+		if (isNil(alreadyExist) || alreadyExist.length === 0) {
 			await interaction.reply('You have no mission notification configured');
 			return;
 		}
