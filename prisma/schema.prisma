@@ -18,4 +18,18 @@ model Missions {
     channelName String
     channelId   String
     words       String[]
+
+    treaty TreatyMission[]
+}
+
+model TreatyMission {
+    id              Int      @id @default(autoincrement())
+    createdAt       DateTime @db.Timestamptz(6)
+    updatedAt       DateTime @db.Timestamptz(6)
+    missionId       Int
+    missionTreatyId String   @db.VarChar(255)
+    url             String?
+    name            String?
+
+    mission Missions @relation(fields: [missionId], references: [id])
 }
