@@ -11,9 +11,19 @@
 		"watch": "nodemon",
 		"start": "node out/index.js",
 		"build": "rimraf out && tsc",
-		"deploy": "yarn build && node out/deploy-commands.js"
+		"deploy": "yarn build && node out/deploy-commands.js",
+		"prisma": "prisma",
+		"db:generate": "prisma generate",
+		"db:deploy": "prisma migrate deploy",
+		"db:format": "prisma format",
+		"db:migrate:reset": "prisma migrate reset",
+		"db:studio": "prisma studio",
+		"db:validate": "prisma validate",
+		"db:migrate:create": "prisma migrate dev --create-only",
+		"db:migrate:dev": "prisma migrate dev"
 	},
 	"dependencies": {
+		"@prisma/client": "5.4.1",
 		"cron": "^2.4.0",
 		"date-fns": "^2.29.3",
 		"discord.js": "^14.7.1",
