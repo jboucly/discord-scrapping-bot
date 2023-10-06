@@ -9,7 +9,7 @@ app.use(express.json());
 // Run discord bot
 new DiscordClient();
 
-app.post('/', async function (req, res) {
+app.get('/', async function (req, res) {
 	return res.send({
 		type: 'InteractionResponse',
 		data: {
