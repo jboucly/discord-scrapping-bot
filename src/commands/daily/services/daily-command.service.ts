@@ -1,20 +1,20 @@
+import { Daily } from '@prisma/client';
 import { CronJob } from 'cron';
 import { Client, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
-import JsonStorage from '../../../common/services/json-storage.service';
-import { Daily } from '../types/daily.types';
+import { PrismaService } from '../../../common/services/prisma.service';
 
 export class DailyCommandService {
-	public static startCronJobs(client: Client): void {
-		const storage = new JsonStorage('daily.json');
+	constructor(private readonly prismaService: PrismaService = new PrismaService()) {}
 
-		const cronData = storage.get('cron', true);
+	public async startCronJobs(client: Client): Promise<void> {
+		const cronData = await this.prismaService.daily.findMany();
 
 		if (!isNil(cronData)) {
 			cronData.forEach((daily: Daily) => {
-				const cron = new CronJob(daily.time, () => {
+				const cron = new CronJob(daily.crontab, () => {
 					const channel = client.channels.cache.find(
-						(channel: any) => channel.id === daily.channel
+						(channel: any) => channel.id === daily.channelId
 					) as TextChannel;
 
 					if (isNil(channel)) {

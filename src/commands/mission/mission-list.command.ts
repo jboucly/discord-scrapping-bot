@@ -1,15 +1,14 @@
+import { Missions } from '@prisma/client';
 import { ChatInputCommandInteraction, Client, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { isNil } from 'lodash';
-import JsonStorage from '../../common/services/json-storage.service';
-import { MissionStorage } from './enums/mission-storage.enum';
-import { MissionNotificationSaved } from './interfaces/mission-notification-saved.interface';
+import { PrismaService } from '../../common/services/prisma.service';
 
-function createEmbeds(missions: MissionNotificationSaved[]): EmbedBuilder[] {
+function createEmbeds(missions: Missions[]): EmbedBuilder[] {
 	const valToReturn: EmbedBuilder[] = [];
 
 	missions.forEach((mission) => {
 		const embed = new EmbedBuilder()
-			.setTitle(`Channel: ${mission.channel}`)
+			.setTitle(`Channel: ${mission.channelName}`)
 			.setDescription(`Words: ${mission.words.join(', ')}`);
 
 		valToReturn.push(embed);
@@ -24,8 +23,8 @@ const MissionListCommand = {
 		.setDescription('Get your mission notification configured')
 		.toJSON(),
 	async execute(interaction: ChatInputCommandInteraction, client: Client) {
-		const storage = new JsonStorage('mission.json');
-		const alreadyExist = storage.get(MissionStorage.NOTIFICATIONS, true) as MissionNotificationSaved[];
+		const prisma = new PrismaService();
+		const alreadyExist = await prisma.missions.findMany();
 
 		if (isNil(alreadyExist)) {
 			await interaction.reply('You have no mission notification configured');
