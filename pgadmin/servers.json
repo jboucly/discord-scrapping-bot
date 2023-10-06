@@ -1,0 +1,13 @@
+{
+	"Servers": {
+		"1": {
+			"Port": 5432,
+			"Group": "Servers",
+			"SSLMode": "prefer",
+			"Host": "postgresql",
+			"Name": "DevBot",
+			"Username": "root",
+			"MaintenanceDB": "devbot"
+		}
+	}
+}

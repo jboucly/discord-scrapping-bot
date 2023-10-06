@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "TreatyMission" ALTER COLUMN "url" SET DATA TYPE TEXT,
+ALTER COLUMN "name" SET DATA TYPE TEXT;

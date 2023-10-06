@@ -12,3 +12,8 @@ export interface MissionNotification {
 	description?: string;
 	skills?: string[];
 }
+
+export interface MissionToTrack {
+	channelId: string;
+	missions: MissionNotification[];
+}

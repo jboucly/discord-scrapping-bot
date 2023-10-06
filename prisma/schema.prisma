@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Missions {
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @db.Timestamptz(6)
+    updatedAt   DateTime @db.Timestamptz(6)
+    channelName String
+    channelId   String
+    words       String[]
+
+    treaty TreatyMission[]
+}
+
+model TreatyMission {
+    id              Int      @id @default(autoincrement())
+    createdAt       DateTime @db.Timestamptz(6)
+    updatedAt       DateTime @db.Timestamptz(6)
+    missionId       Int
+    missionTreatyId String   @db.VarChar(255)
+    url             String?
+    name            String?
+
+    mission Missions @relation(fields: [missionId], references: [id])
+}
+
+model Daily {
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @db.Timestamptz(6)
+    updatedAt   DateTime @db.Timestamptz(6)
+    crontab     String   @db.VarChar(255)
+    channelId   String   @db.VarChar(255)
+    channelName String   @db.VarChar(255)
+    message     String   @db.VarChar(255)
+}

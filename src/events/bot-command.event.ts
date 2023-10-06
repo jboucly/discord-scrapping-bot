@@ -14,7 +14,8 @@ export class BotCommandEvent {
 
 	constructor(
 		private client: Client,
-		private missionCommandService: MissionCommandService = new MissionCommandService()
+		private dailyCommandService: DailyCommandService = new DailyCommandService(),
+		private missionCommandService: MissionCommandService = new MissionCommandService(),
 	) {
 		this.setCollection();
 		this.setCommandEvent();
@@ -29,7 +30,7 @@ export class BotCommandEvent {
 			switch (c.data.name) {
 				case 'daily':
 					// If the command is daily, start the cron jobs
-					DailyCommandService.startCronJobs(this.client);
+					this.dailyCommandService.startCronJobs(this.client);
 					break;
 				case 'mission':
 					this.missionCommandService.startCronJobs(this.client);
