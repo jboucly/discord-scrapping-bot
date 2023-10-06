@@ -1,0 +1,42 @@
+name: Build, Quality, Test
+
+on:
+    push:
+        branches:
+            - '*' # matches every branch that doesn't contain a '/'
+            - '*/*' # matches every branch containing a single '/'
+            - '**' # matches every branch
+
+jobs:
+    default:
+        container:
+            image: node:12
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "::set-output name=dir::$(yarn cache dir)"
+
+            - name: Cache modules
+              uses: actions/cache@v1.1.2
+              id: yarn-cache
+              with:
+                  node-version: '12'
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Install dependencies
+              run: yarn --froze-lockfile
+
+            - name: Prettier
+              run: yarn prettier
+
+            - name: Build
+              run: yarn build
