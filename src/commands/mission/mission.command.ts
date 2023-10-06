@@ -1,39 +1,16 @@
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
-import { isArray, isNil, uniq } from 'lodash';
-import JsonStorage from '../../common/services/json-storage.service';
+import { isArray, isNil } from 'lodash';
+import { PrismaService } from '../../common/services/prisma.service';
 import { CommandOptionsUtils } from '../../common/utils/command-options.utils';
+import { SetDevBotReact } from '../../common/utils/react.utils';
 import { MissionOptions } from './enums/mission-option.enum';
-import { MissionStorage } from './enums/mission-storage.enum';
-import { MissionNotificationSaved } from './interfaces/mission-notification-saved.interface';
 
-function getWords(words: string): string[] | string {
+function getWords(words: string): string[] {
 	if (words.includes(',') || words.includes(' ')) {
 		return words.split(/,|\s/).filter((w) => w !== '');
 	}
 
-	return words;
-}
-
-function removeDuplicate(
-	words: MissionNotificationSaved[],
-	newWords: string[],
-	channel: string
-): MissionNotificationSaved[] {
-	const exist = words.find((w) => w.channel === channel);
-
-	if (exist) {
-		const uniqWords = uniq([...newWords, ...exist.words]);
-
-		return words.map((w) => {
-			if (w.channel === channel) {
-				w.words = uniqWords;
-			}
-
-			return w;
-		});
-	}
-
-	return [...words, { channel, words: newWords }];
+	return [words];
 }
 
 const MissionCommand = {
@@ -49,48 +26,69 @@ const MissionCommand = {
 		.addStringOption((opts) => opts.setName(MissionOptions.WORDS).setDescription('Set keyword to search mission'))
 		.toJSON(),
 	async execute(interaction: ChatInputCommandInteraction, client: Client) {
+		const prisma = new PrismaService();
 		const optEnabled = CommandOptionsUtils.getRequired(interaction, MissionOptions.ENABLED);
 		const optWords = CommandOptionsUtils.getNotRequired(interaction, MissionOptions.WORDS);
 
 		const channel = interaction.channel;
 		if (isNil(channel)) throw new Error('Channel not found');
 
-		const storage = new JsonStorage('mission.json');
-		const alreadyExist = storage.get(MissionStorage.NOTIFICATIONS, true) as MissionNotificationSaved[];
+		const alreadyExist = await prisma.missions.findFirst({
+			where: {
+				channelId: channel.id,
+			},
+		});
 
 		if (optEnabled.value === false) {
 			if (!isNil(alreadyExist)) {
-				alreadyExist.forEach((mission) => {
-					if (mission.channel === channel.id) {
-						storage.update(
-							MissionStorage.NOTIFICATIONS,
-							alreadyExist.filter((r) => r.channel !== mission.channel)
-						);
-					}
+				await prisma.missions.delete({
+					where: {
+						id: alreadyExist.id,
+					},
 				});
 			}
-			await interaction.reply('🚀 Notification mission removed');
+			await interaction.reply({ content: '🚀 Notification mission removed', fetchReply: true });
 			return;
 		} else if (isNil(optWords)) {
-			await interaction.reply('🚀 Please input keyword');
+			await interaction.reply({ content: '🚀 Please input keyword', fetchReply: true });
 			return;
 		} else {
 			if (!isNil(alreadyExist)) {
 				const newWords = getWords(optWords.value as string);
 
 				if (isArray(newWords)) {
-					storage.update(MissionStorage.NOTIFICATIONS, removeDuplicate(alreadyExist, newWords, channel.id));
+					await prisma.missions.update({
+						where: {
+							id: alreadyExist.id,
+						},
+						data: {
+							words: newWords,
+						},
+					});
 				} else {
-					storage.update(MissionStorage.NOTIFICATIONS, [
-						...alreadyExist.filter((r) => r.channel !== channel.id),
-						{ channel: channel.id, words: newWords },
-					]);
+					await prisma.missions.update({
+						where: {
+							id: alreadyExist.id,
+						},
+						data: {
+							words: [newWords],
+						},
+					});
 				}
 			} else {
-				storage.set(MissionStorage.NOTIFICATIONS, [{ channel: channel.id, words: [optWords.value as string] }]);
+				await prisma.missions.create({
+					data: {
+						createdAt: new Date(),
+						updatedAt: new Date(),
+						channelId: channel.id,
+						channelName: (channel as any)['name'],
+						words: getWords(optWords.value as string),
+					},
+				});
 			}
 
-			await interaction.reply('🚀 Notification mission enabled');
+			const message = await interaction.reply({ content: '🚀 Notification mission enabled', fetchReply: true });
+			await SetDevBotReact(client, message);
 		}
 	},
 };
