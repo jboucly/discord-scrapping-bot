@@ -1,0 +1,36 @@
+version: '3'
+
+networks:
+    dev-bot:
+
+services:
+    postgresql:
+        container_name: postgresql
+        image: postgres:14
+        ports:
+            - 5455:5432
+        env_file:
+            - .env
+        environment:
+            POSTGRES_DB: ${BDD_DATABASE}
+            POSTGRES_USER: ${BDD_USERNAME}
+            POSTGRES_PASSWORD: ${BDD_PASSWORD}
+        networks:
+            - dev-bot
+        volumes:
+            - ./volumes/postgresql:/var/lib/postgresql/data
+
+    pgadmin4:
+        container_name: pgadmin
+        image: dpage/pgadmin4:6.9
+        env_file:
+            - .env
+        ports:
+            - 3500:80
+        environment:
+            - 'PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}'
+            - 'PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}'
+        volumes:
+            - ./pgadmin/servers.json:/pgadmin4/servers.json
+        networks:
+            - dev-bot
