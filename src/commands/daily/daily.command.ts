@@ -45,14 +45,15 @@ const DailyCommand = {
 
 		const dailyToSave = {
 			time: `00 ${crontab[1]} ${crontab[0]} * * *`,
-			channel: optChannel.value as string,
 			message: optMessage.value as string,
+			channelId: optChannel.value as string,
+			chanelName: (client.channels.cache.find((channel: any) => channel.id === optChannel.value) as any)?.name,
 		};
 
 		const res = await prisma.daily.findFirst({
 			where: {
 				crontab: dailyToSave.time,
-				channelId: dailyToSave.channel,
+				channelId: dailyToSave.channelId,
 			},
 		});
 
@@ -72,15 +73,16 @@ const DailyCommand = {
 					createdAt: new Date(),
 					updatedAt: new Date(),
 					crontab: dailyToSave.time,
-					channelId: dailyToSave.channel,
+					channelId: dailyToSave.channelId,
 					message: dailyToSave.message,
+					channelName: dailyToSave.chanelName,
 				},
 			});
 		}
 
 		const cron = new CronJob(dailyToSave.time, async () => {
 			const channel = client.channels.cache.find(
-				(channel: any) => channel.id === dailyToSave.channel
+				(channel: any) => channel.id === dailyToSave.channelId
 			) as TextChannel;
 
 			if (isNil(channel)) {

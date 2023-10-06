@@ -25,6 +25,7 @@
 	"dependencies": {
 		"@prisma/client": "5.4.1",
 		"cron": "^2.4.0",
+		"cronstrue": "^2.32.0",
 		"date-fns": "^2.29.3",
 		"discord.js": "^14.7.1",
 		"dotenv": "^16.0.3",

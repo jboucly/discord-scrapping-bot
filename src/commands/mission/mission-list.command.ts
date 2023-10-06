@@ -8,8 +8,10 @@ function createEmbeds(missions: Missions[]): EmbedBuilder[] {
 
 	missions.forEach((mission) => {
 		const embed = new EmbedBuilder()
-			.setTitle(`Channel: ${mission.channelName}`)
-			.setDescription(`Words: ${mission.words.join(', ')}`);
+			.setColor('#006F62')
+			.setTitle(`Channel : ${mission.channelName}`)
+			.setDescription(`Words : ${mission.words.join(', ')}`)
+			.setTimestamp(mission.updatedAt);
 
 		valToReturn.push(embed);
 	});

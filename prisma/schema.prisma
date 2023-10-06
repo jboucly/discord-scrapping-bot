@@ -35,10 +35,11 @@ model TreatyMission {
 }
 
 model Daily {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @db.Timestamptz(6)
-    updatedAt DateTime @db.Timestamptz(6)
-    crontab   String   @db.VarChar(255)
-    channelId String   @db.VarChar(255)
-    message   String   @db.VarChar(255)
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @db.Timestamptz(6)
+    updatedAt   DateTime @db.Timestamptz(6)
+    crontab     String   @db.VarChar(255)
+    channelId   String   @db.VarChar(255)
+    channelName String   @db.VarChar(255)
+    message     String   @db.VarChar(255)
 }
