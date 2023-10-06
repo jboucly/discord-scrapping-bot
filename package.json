@@ -7,6 +7,9 @@
 	"author": "jboucly <julien.boucly@outlook.com>",
 	"license": "MIT",
 	"private": false,
+	"engines": {
+		"node": "18.15.0"
+	},
 	"scripts": {
 		"watch": "nodemon",
 		"start": "node out/index.js",
