@@ -40,7 +40,7 @@ export class MissionCommandService {
 					const embedMessages = this.createEmbeds(missionToSend);
 
 					const channel = client.channels.cache.find(
-						(channel: any) => channel.id === missionSearch.channelId
+						(channel: any) => channel.id === missionSearch.channelId,
 					) as TextChannel;
 
 					if (isNil(channel)) {
@@ -68,8 +68,8 @@ export class MissionCommandService {
 					console.info(
 						`ℹ️  ${nbMessage} missions notification send to ${channel.name}: ${channel.id}\n⏰ ${format(
 							new Date(),
-							'dd/MM/yyyy HH:mm:ss'
-						)}\n———————————————————————————————————————————————————————————`
+							'dd/MM/yyyy HH:mm:ss',
+						)}\n———————————————————————————————————————————————————————————`,
 					);
 
 					if (missionToSend.length > 0) {
@@ -113,7 +113,7 @@ export class MissionCommandService {
 
 				if (!isNil(mission.description)) {
 					embed.setDescription(
-						mission.description.length > 100 ? mission.description.slice(0, 100) : mission.description
+						mission.description.length > 100 ? mission.description.slice(0, 100) : mission.description,
 					);
 				}
 
@@ -138,8 +138,8 @@ export class MissionCommandService {
 				const toReturn: MissionToTrack = { channelId: missionSearch.channelId, missions: [] };
 				const response = await fetch(
 					`${process.env.FREE_WORK_URL}?contracts=contractor&searchKeywords=${missionSearch.words.join(
-						','
-					)}&order=date&page=1&itemsPerPage=20`
+						',',
+					)}&order=date&page=1&itemsPerPage=20`,
 				);
 				const jobs = (await response.json()) as FreeWorkJobs;
 

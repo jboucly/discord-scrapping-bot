@@ -21,7 +21,7 @@ const MissionCommand = {
 			opts
 				.setRequired(true)
 				.setName(MissionOptions.ENABLED)
-				.setDescription('Enable or disable the mission notification')
+				.setDescription('Enable or disable the mission notification'),
 		)
 		.addStringOption((opts) => opts.setName(MissionOptions.WORDS).setDescription('Set keyword to search mission'))
 		.toJSON(),

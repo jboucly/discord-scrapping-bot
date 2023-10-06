@@ -14,19 +14,19 @@ const DailyCommand = {
 			opts
 				.setRequired(true)
 				.setName(DailyOptions.HOUR)
-				.setDescription('Save the time you want to have the daily. In the format: hh:mm')
+				.setDescription('Save the time you want to have the daily. In the format: hh:mm'),
 		)
 		.addStringOption((opts) =>
 			opts
 				.setRequired(true)
 				.setName(DailyOptions.MESSAGE)
-				.setDescription('Save the message you want to receive in the daily')
+				.setDescription('Save the message you want to receive in the daily'),
 		)
 		.addChannelOption((opts) =>
 			opts
 				.setRequired(true)
 				.setName(DailyOptions.CHANNEL)
-				.setDescription('Save the channel you want to receive the daily')
+				.setDescription('Save the channel you want to receive the daily'),
 		)
 		.toJSON(),
 	async execute(interaction: ChatInputCommandInteraction, client: Client) {
@@ -82,7 +82,7 @@ const DailyCommand = {
 
 		const cron = new CronJob(dailyToSave.time, async () => {
 			const channel = client.channels.cache.find(
-				(channel: any) => channel.id === dailyToSave.channelId
+				(channel: any) => channel.id === dailyToSave.channelId,
 			) as TextChannel;
 
 			if (isNil(channel)) {

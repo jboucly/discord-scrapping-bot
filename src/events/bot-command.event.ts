@@ -15,7 +15,7 @@ export class BotCommandEvent {
 	constructor(
 		private client: Client,
 		private dailyCommandService: DailyCommandService = new DailyCommandService(),
-		private missionCommandService: MissionCommandService = new MissionCommandService()
+		private missionCommandService: MissionCommandService = new MissionCommandService(),
 	) {
 		this.setCollection();
 		this.setCommandEvent();
