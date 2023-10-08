@@ -11,7 +11,11 @@ export const CommandOptionsUtils = {
 		return opts;
 	},
 
-	getNotRequired(interaction: ChatInputCommandInteraction, name: string): CommandInteractionOption | undefined {
+	getNotRequired(
+		interaction: ChatInputCommandInteraction | undefined,
+		name: string,
+	): CommandInteractionOption | undefined {
+		if (!interaction) return undefined;
 		return interaction.options.data.find((e) => e.name === name);
 	},
 };
