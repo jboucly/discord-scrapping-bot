@@ -72,11 +72,10 @@ const MissionCommand = {
 			const alreadyExist = await prisma.missions.findMany();
 
 			if (isNil(alreadyExist) || alreadyExist.length === 0) {
-				const message = await interaction.reply({
+				await interaction.reply({
 					content: 'You have no mission notification configured',
-					fetchReply: true,
+					ephemeral: true,
 				});
-				await SetDevBotReact(client, message);
 				return;
 			}
 
