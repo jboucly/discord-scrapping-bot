@@ -31,7 +31,7 @@ model TreatyMission {
     url             String?
     name            String?
 
-    mission Missions @relation(fields: [missionId], references: [id])
+    mission Missions @relation(fields: [missionId], references: [id], onDelete: Cascade)
 }
 
 model Daily {
