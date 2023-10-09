@@ -1,14 +1,18 @@
 import { Daily } from '@prisma/client';
 import { CronJob } from 'cron';
 import {
+	ActionRowBuilder,
 	ChatInputCommandInteraction,
 	Client,
 	CommandInteractionOption,
 	EmbedBuilder,
 	SlashCommandBuilder,
+	StringSelectMenuBuilder,
+	StringSelectMenuInteraction,
+	StringSelectMenuOptionBuilder,
 	TextChannel,
 } from 'discord.js';
-import { isNil } from 'lodash';
+import { isNaN, isNil, isNumber } from 'lodash';
 import { PrismaService } from '../../common/services/prisma.service';
 import { CommandOptionsUtils } from '../../common/utils/command-options.utils';
 import { SetDevBotReact } from '../../common/utils/react.utils';
@@ -174,13 +178,62 @@ const DailyCommand = {
 			const channel = interaction.channel;
 			if (isNil(channel)) throw new Error('Channel not found');
 
-			await prisma.daily.deleteMany({
-				where: {
-					channelId: channel.id,
-				},
+			const allDaily = await prisma.daily.findMany();
+
+			const selectInput = new StringSelectMenuBuilder()
+				.setCustomId('removeDailySelect')
+				.setPlaceholder('Select a daily to remove')
+				.addOptions(
+					allDaily.map((daily) =>
+						new StringSelectMenuOptionBuilder()
+							.setLabel(TransformCrontab.toString(daily.crontab, { verbose: true }))
+							.setDescription(daily.message)
+							.setValue(daily.id.toString()),
+					),
+				);
+
+			const actionRow = new ActionRowBuilder().addComponents(selectInput);
+
+			const response = await interaction.reply({
+				content: 'Choose daily to remove :',
+				components: [actionRow as any],
 			});
 
-			await SetDevBotReact(client, await interaction.reply({ content: '🚀 Daily removed', fetchReply: true }));
+			try {
+				const confirmation = (await response.awaitMessageComponent({
+					filter: (i) => i.user.id === interaction.user.id,
+					time: 60000,
+				})) as StringSelectMenuInteraction;
+
+				const dailyIdToRemove = Number(confirmation.values[0]);
+
+				if (isNumber(Number(dailyIdToRemove)) && !isNaN(dailyIdToRemove)) {
+					await prisma.daily.deleteMany({
+						where: {
+							id: dailyIdToRemove,
+						},
+					});
+
+					const res = await interaction.editReply({
+						content: '🚀 Daily removed',
+						components: [],
+					});
+					await SetDevBotReact(client, res);
+					return;
+				}
+
+				await interaction.editReply({
+					content: 'Error while removing daily',
+					components: [],
+				});
+				return;
+			} catch (e) {
+				await interaction.editReply({
+					content: 'Confirmation not received within 1 minute, cancelling',
+					components: [],
+				});
+				return;
+			}
 		}
 	},
 };
