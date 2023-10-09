@@ -175,10 +175,12 @@ const DailyCommand = {
 			const message = await interaction.reply({ embeds: createEmbeds(alreadyExist), fetchReply: true });
 			await SetDevBotReact(client, message);
 		} else if (isDisabled) {
-			const channel = interaction.channel;
-			if (isNil(channel)) throw new Error('Channel not found');
-
 			const allDaily = await prisma.daily.findMany();
+
+			if (allDaily.length === 0) {
+				await interaction.reply({ content: 'You have no daily configured', ephemeral: true });
+				return;
+			}
 
 			const selectInput = new StringSelectMenuBuilder()
 				.setCustomId('removeDailySelect')
