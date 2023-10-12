@@ -141,7 +141,7 @@ export class MissionCommandService {
 						',',
 					)}&order=date&page=1&itemsPerPage=20`,
 				);
-				const jobs = (await response.json()) as FreeWorkJobs
+				const jobs = (await response.json()) as FreeWorkJobs;
 
 				for (let j = 0; j < jobs['hydra:member'].length; j++) {
 					const job = jobs['hydra:member'][j];
