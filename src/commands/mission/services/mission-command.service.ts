@@ -141,7 +141,7 @@ export class MissionCommandService {
 						',',
 					)}&order=date&page=1&itemsPerPage=20`,
 				);
-				const jobs = (await response.json()) as FreeWorkJobs;
+				const jobs = (await response.json()) as FreeWorkJobs
 
 				for (let j = 0; j < jobs['hydra:member'].length; j++) {
 					const job = jobs['hydra:member'][j];
@@ -159,7 +159,7 @@ export class MissionCommandService {
 						durationMonth: job?.durationValue
 							? `${job?.durationValue} ${job?.durationPeriod}`
 							: 'Non mentionné',
-						url: `https://www.free-work.com/fr/tech-it/developpeur-java/job-mission/${job.slug}`,
+						url: `https://www.free-work.com/fr/tech-it/${job.job.slug}/job-mission/${job.slug}`,
 					});
 				}
 
