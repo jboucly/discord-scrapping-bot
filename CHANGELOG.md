@@ -30,3 +30,7 @@ Total overhaul of commands : `/daily` and `/mission`
     -   `/mission list`
     -   `/mission enable ...opts`
     -   `/mission disabled`
+
+## 0.0.4
+
+-   Fix link of mission
