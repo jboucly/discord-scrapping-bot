@@ -12,12 +12,13 @@ datasource db {
 }
 
 model Missions {
-    id          Int      @id @default(autoincrement())
-    createdAt   DateTime @db.Timestamptz(6)
-    updatedAt   DateTime @db.Timestamptz(6)
-    channelName String
-    channelId   String
-    words       String[]
+    id             Int      @id @default(autoincrement())
+    createdAt      DateTime @db.Timestamptz(6)
+    updatedAt      DateTime @db.Timestamptz(6)
+    channelName    String
+    channelId      String
+    words          String[]
+    forbiddenWords String[] @default([])
 
     treaty TreatyMission[]
 }
