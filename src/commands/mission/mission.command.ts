@@ -31,7 +31,9 @@ function createEmbeds(missions: Missions[]): EmbedBuilder[] {
 		const embed = new EmbedBuilder()
 			.setColor('#006F62')
 			.setTitle(`Channel : ${mission.channelName}`)
-			.setDescription(`Words : ${mission.words.join(', ')}`)
+			.setDescription(
+				`Words : ${mission.words.join(', ')} \n Forbidden words : ${mission.forbiddenWords.join(', ')}`,
+			)
 			.setTimestamp(mission.updatedAt);
 
 		valToReturn.push(embed);
