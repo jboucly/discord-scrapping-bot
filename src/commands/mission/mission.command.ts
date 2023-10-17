@@ -59,6 +59,11 @@ const MissionCommand = {
 						.setName(MissionOptions.CHANNEL)
 						.setDescription('Set channel to send missions')
 						.setRequired(true),
+				)
+				.addStringOption((opts) =>
+					opts
+						.setName(MissionOptions.FORBIDDEN_WORDS)
+						.setDescription("It's possible to set forbidden words to exclude mission"),
 				),
 		)
 		.addSubcommand((subcommand) =>
@@ -170,14 +175,18 @@ const MissionCommand = {
 					const newWords = getWords(
 						isEnabled.options.find((e) => e.name === MissionOptions.WORDS)?.value as string,
 					);
+					const newForbiddenWords = getWords(
+						isEnabled.options.find((e) => e.name === MissionOptions.FORBIDDEN_WORDS)?.value as string,
+					);
 
 					let words: string[] = isArray(newWords) ? newWords : [newWords];
+					let forbiddenWords: string[] = isArray(newForbiddenWords) ? newForbiddenWords : [newForbiddenWords];
 
 					await prisma.missions.update({
 						where: {
 							id: alreadyExist.id,
 						},
-						data: { words },
+						data: { words, forbiddenWords },
 					});
 				} else {
 					await prisma.missions.create({
@@ -190,6 +199,10 @@ const MissionCommand = {
 							)?.name,
 							words: getWords(
 								isEnabled.options.find((e) => e.name === MissionOptions.WORDS)?.value as string,
+							),
+							forbiddenWords: getWords(
+								isEnabled.options.find((e) => e.name === MissionOptions.FORBIDDEN_WORDS)
+									?.value as string,
 							),
 						},
 					});
