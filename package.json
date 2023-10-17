@@ -1,6 +1,6 @@
 {
 	"name": "discord-daily-bot",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"description": "Discord bot for weekly daily",
 	"main": "out/index.js",
 	"repository": "git@github.com:jboucly/discord-daily-bot.git",

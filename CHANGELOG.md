@@ -34,3 +34,9 @@ Total overhaul of commands : `/daily` and `/mission`
 ## 0.0.4
 
 -   Fix link of mission
+
+## 0.0.5
+
+-   Added forbidden words list in `Missions` table and generate migration file.
+-   Implement forbidden words list in `/mission enable` command.
+-   Implement forbidden words list in `/mission list` command.
