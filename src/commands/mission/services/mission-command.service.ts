@@ -4,7 +4,7 @@ import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
 import fetch from 'node-fetch';
 import { PrismaService } from '../../../common/services/prisma.service';
-import { FreeWorkJobs } from '../interfaces/free-work-jobs.interface';
+import { FreeWorkJob, FreeWorkJobs } from '../interfaces/free-work-jobs.interface';
 import { MissionNotification, MissionToTrack } from '../interfaces/mission-notification.interface';
 import { PyloteJobs } from '../interfaces/pylote-jobs.interface';
 
@@ -146,21 +146,23 @@ export class MissionCommandService {
 				for (let j = 0; j < jobs['hydra:member'].length; j++) {
 					const job = jobs['hydra:member'][j];
 
-					toReturn.missions.push({
-						id: `${job.id}`,
-						from: 'freework',
-						name: job.title,
-						date: job.createdAt,
-						city: job.location.label,
-						platform: 'FreeWork',
-						description: job?.description,
-						iconUrl: job?.company?.logo?.medium,
-						skills: job?.skills.map((v) => v.name),
-						durationMonth: job?.durationValue
-							? `${job?.durationValue} ${job?.durationPeriod}`
-							: 'Non mentionné',
-						url: `https://www.free-work.com/fr/tech-it/${job.job.slug}/job-mission/${job.slug}`,
-					});
+					if (this.checkNotContainForbiddenWord(job, missionSearch.forbiddenWords)) {
+						toReturn.missions.push({
+							id: `${job.id}`,
+							from: 'freework',
+							name: job.title,
+							date: job.createdAt,
+							city: job.location.label,
+							platform: 'FreeWork',
+							description: job?.description,
+							iconUrl: job?.company?.logo?.medium,
+							skills: job?.skills.map((v) => v.name),
+							durationMonth: job?.durationValue
+								? `${job?.durationValue} ${job?.durationPeriod}`
+								: 'Non mentionné',
+							url: `https://www.free-work.com/fr/tech-it/${job.job.slug}/job-mission/${job.slug}`,
+						});
+					}
 				}
 
 				valToReturn.push(toReturn);
@@ -206,5 +208,19 @@ export class MissionCommandService {
 		}
 
 		return valToReturn;
+	}
+
+	private checkNotContainForbiddenWord(job: FreeWorkJob, forbiddenWords: string[]): boolean {
+		if (forbiddenWords.length === 0) return true;
+
+		for (let i = 0; i < forbiddenWords.length; i++) {
+			const forbiddenWord = forbiddenWords[i];
+
+			if (job.title.toLocaleLowerCase().includes(forbiddenWord.toLocaleLowerCase())) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
