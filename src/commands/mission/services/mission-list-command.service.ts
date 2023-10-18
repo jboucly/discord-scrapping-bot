@@ -32,11 +32,13 @@ export class MissionListCommandService implements ICommand {
 	private createEmbeds(missions: Missions[]): EmbedBuilder[] {
 		const valToReturn: EmbedBuilder[] = [];
 
+		console.log(missions);
+
 		missions.forEach((mission) => {
-			const desc = `Words : ${mission.words.join(', ')}`;
+			let desc = `Words : ${mission.words.join(', ')}`;
 
 			if (mission.forbiddenWords.length > 0) {
-				desc.concat(`\n Forbidden words : ${mission.forbiddenWords.join(', ')}`);
+				desc += `\n Forbidden words : ${mission.forbiddenWords.join(', ')}`;
 			}
 
 			const embed = new EmbedBuilder()
