@@ -40,3 +40,13 @@ Total overhaul of commands : `/daily` and `/mission`
 -   Added forbidden words list in `Missions` table and generate migration file.
 -   Implement forbidden words list in `/mission enable` command.
 -   Implement forbidden words list in `/mission list` command.
+
+## 0.0.6
+
+-   Create `/mission update` command
+-   Export all logic of `/mission` command to services files
+-   Set all message of command to ephemeral
+-   Added `userId` in `Missions` table for check if user is the owner of the mission
+-   Added `env.example` file
+-   Update `procfile` to deploy command on Heroku
+-   Update `README.md` file

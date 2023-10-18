@@ -53,6 +53,9 @@ Example :
 
 # Remove mission notification
 /daily disabled
+
+# Update mission notification
+/daily update
 ```
 
 ## Installation
