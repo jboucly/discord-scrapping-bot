@@ -3,7 +3,6 @@ import { ChatInputCommandInteraction, Client, EmbedBuilder } from 'discord.js';
 import { isNil } from 'lodash';
 import { ICommand } from '../../../common/interfaces/command.interface';
 import { PrismaService } from '../../../common/services/prisma.service';
-import { SetDevBotReact } from '../../../common/utils/react.utils';
 
 export class MissionListCommandService implements ICommand {
 	constructor(
@@ -25,14 +24,11 @@ export class MissionListCommandService implements ICommand {
 			return;
 		}
 
-		const message = await this.interaction.reply({ embeds: this.createEmbeds(alreadyExist), fetchReply: true });
-		await SetDevBotReact(this.client, message);
+		await this.interaction.reply({ embeds: this.createEmbeds(alreadyExist), fetchReply: true, ephemeral: true });
 	}
 
 	private createEmbeds(missions: Missions[]): EmbedBuilder[] {
 		const valToReturn: EmbedBuilder[] = [];
-
-		console.log(missions);
 
 		missions.forEach((mission) => {
 			let desc = `Words : ${mission.words.join(', ')}`;
