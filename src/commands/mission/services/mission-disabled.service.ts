@@ -33,21 +33,27 @@ export class MissionDisabledCommandService implements ICommand {
 		}
 
 		const selectInput = new StringSelectMenuBuilder()
-			.setCustomId('removeDailySelect')
-			.setPlaceholder('Select a daily to remove')
+			.setCustomId('removeMissionSelect')
+			.setPlaceholder('Select a mission to remove')
 			.addOptions(
-				allMissionSaved.map((mission) =>
-					new StringSelectMenuOptionBuilder()
+				allMissionSaved.map((mission) => {
+					const desc = `Words : ${mission.words.join(', ')}`;
+
+					if (mission.forbiddenWords.length > 0) {
+						desc.concat(`\n Forbidden words : ${mission.forbiddenWords.join(', ')}`);
+					}
+
+					return new StringSelectMenuOptionBuilder()
 						.setLabel(`Channel : ${mission.channelName}`)
-						.setDescription(`Words : ${mission.words.join(', ')}`)
-						.setValue(mission.id.toString()),
-				),
+						.setDescription(desc)
+						.setValue(mission.id.toString());
+				}),
 			);
 
 		const actionRow = new ActionRowBuilder().addComponents(selectInput);
 
 		const response = await this.interaction.reply({
-			content: 'Choose daily to remove :',
+			content: 'Choose mission to remove :',
 			components: [actionRow as any],
 		});
 

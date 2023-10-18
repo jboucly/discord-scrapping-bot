@@ -7,6 +7,7 @@ import { MissionOptions } from '../enums/mission-option.enum';
 import { MissionDisabledCommandService } from './mission-disabled.service';
 import { EnabledMissionCommandService } from './mission-enabled-command.service';
 import { MissionListCommandService } from './mission-list-command.service';
+import { UpdateMissionCommandService } from './update-mission-command.service';
 
 export class MissionCommandService implements ICommand {
 	constructor(
@@ -28,6 +29,11 @@ export class MissionCommandService implements ICommand {
 			prismaService,
 			interaction,
 		),
+		private updateMissionCommandService: UpdateMissionCommandService = new UpdateMissionCommandService(
+			client,
+			prismaService,
+			interaction,
+		),
 	) {
 		this.execute();
 	}
@@ -36,6 +42,7 @@ export class MissionCommandService implements ICommand {
 		const isEnabled = CommandOptionsUtils.getNotRequired(this.interaction, MissionOptions.ENABLED);
 		const isMissionList = !isNil(CommandOptionsUtils.getNotRequired(this.interaction, MissionOptions.LIST));
 		const isDisabled = !isNil(CommandOptionsUtils.getNotRequired(this.interaction, MissionOptions.DISABLED));
+		const isToUpdate = !isNil(CommandOptionsUtils.getNotRequired(this.interaction, MissionOptions.UPDATE));
 
 		if (isMissionList) {
 			return await this.missionListCommandService.execute();
@@ -44,7 +51,9 @@ export class MissionCommandService implements ICommand {
 		} else if (isEnabled && isEnabled.options?.length === 0) {
 			return await this.enabledMissionCommandService.sendNoOptionMessage();
 		} else if (isEnabled && isEnabled.options) {
-			return this.enabledMissionCommandService.execute(isEnabled.options);
+			return await this.enabledMissionCommandService.execute(isEnabled.options);
+		} else if (isToUpdate) {
+			return await this.updateMissionCommandService.execute();
 		}
 	}
 }

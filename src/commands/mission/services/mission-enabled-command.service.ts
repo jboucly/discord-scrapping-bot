@@ -4,8 +4,9 @@ import { ICommand } from '../../../common/interfaces/command.interface';
 import { PrismaService } from '../../../common/services/prisma.service';
 import { SetDevBotReact } from '../../../common/utils/react.utils';
 import { MissionOptions } from '../enums/mission-option.enum';
+import { WordUtils } from '../utils/word.utils';
 
-export class EnabledMissionCommandService implements ICommand {
+export class EnabledMissionCommandService implements ICommand<CommandInteractionOption[]> {
 	constructor(
 		private client: Client,
 		private prismaService: PrismaService,
@@ -18,7 +19,7 @@ export class EnabledMissionCommandService implements ICommand {
 		return;
 	}
 
-	public async execute(options: CommandInteractionOption[]) {
+	public async execute(options: CommandInteractionOption[]): Promise<void> {
 		const optChannel = options?.find((opt) => opt.name === MissionOptions.CHANNEL) as CommandInteractionOption;
 
 		const alreadyExist = await this.prismaService.missions.findFirst({
@@ -29,8 +30,8 @@ export class EnabledMissionCommandService implements ICommand {
 		});
 
 		if (!isNil(alreadyExist)) {
-			const newWords = this.getWords(options.find((e) => e.name === MissionOptions.WORDS)?.value as string);
-			const newForbiddenWords = this.getWords(
+			const newWords = WordUtils.getWords(options.find((e) => e.name === MissionOptions.WORDS)?.value as string);
+			const newForbiddenWords = WordUtils.getWords(
 				options.find((e) => e.name === MissionOptions.FORBIDDEN_WORDS)?.value as string,
 			);
 
@@ -53,8 +54,8 @@ export class EnabledMissionCommandService implements ICommand {
 					channelName: (
 						this.client.channels.cache.find((channel: any) => channel.id === optChannel.value) as any
 					)?.name,
-					words: this.getWords(options.find((e) => e.name === MissionOptions.WORDS)?.value as string),
-					forbiddenWords: this.getWords(
+					words: WordUtils.getWords(options.find((e) => e.name === MissionOptions.WORDS)?.value as string),
+					forbiddenWords: WordUtils.getWords(
 						options.find((e) => e.name === MissionOptions.FORBIDDEN_WORDS)?.value as string,
 					),
 				},
@@ -66,17 +67,5 @@ export class EnabledMissionCommandService implements ICommand {
 			fetchReply: true,
 		});
 		await SetDevBotReact(this.client, message);
-	}
-
-	private getWords(words: string | undefined): string[] {
-		if (isNil(words)) {
-			return [];
-		}
-
-		if (words.includes(',') || words.includes(' ')) {
-			return words.split(/,|\s/).filter((w) => w !== '');
-		}
-
-		return [words];
 	}
 }
