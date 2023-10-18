@@ -48,8 +48,6 @@ export class MissionCommandService implements ICommand {
 			return await this.missionListCommandService.execute();
 		} else if (isDisabled) {
 			return await this.missionDisabledCommandService.execute();
-		} else if (isEnabled && isEnabled.options?.length === 0) {
-			return await this.enabledMissionCommandService.sendNoOptionMessage();
 		} else if (isEnabled && isEnabled.options) {
 			return await this.enabledMissionCommandService.execute(isEnabled.options);
 		} else if (isToUpdate) {

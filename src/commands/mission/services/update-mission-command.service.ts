@@ -13,7 +13,6 @@ import {
 } from 'discord.js';
 import { ICommand } from '../../../common/interfaces/command.interface';
 import { PrismaService } from '../../../common/services/prisma.service';
-import { SetDevBotReact } from '../../../common/utils/react.utils';
 import { WordUtils } from '../utils/word.utils';
 
 export class UpdateMissionCommandService implements ICommand {
@@ -60,6 +59,7 @@ export class UpdateMissionCommandService implements ICommand {
 		const actionRow = new ActionRowBuilder().addComponents(selectInput);
 
 		const response = await this.interaction.reply({
+			ephemeral: true,
 			components: [actionRow as any],
 			content: 'Choose mission to update :',
 		});
@@ -68,12 +68,12 @@ export class UpdateMissionCommandService implements ICommand {
 	}
 
 	private async setSelectEvent(response: InteractionResponse<boolean>): Promise<void> {
-		try {
-			const selectMenuInteraction = (await response.awaitMessageComponent({
-				filter: (i) => i.user.id === this.interaction.user.id,
-				time: 60000,
-			})) as StringSelectMenuInteraction;
+		const selectMenuInteraction = (await response.awaitMessageComponent({
+			filter: (i) => i.user.id === this.interaction.user.id,
+			time: 60000,
+		})) as StringSelectMenuInteraction;
 
+		try {
 			const missionIdToUpdate = Number(selectMenuInteraction.values[0]);
 			const missionToUpdate = await this.prismaService.missions.findUnique({
 				where: {
@@ -88,7 +88,7 @@ export class UpdateMissionCommandService implements ICommand {
 			await selectMenuInteraction.showModal(modal);
 			await this.setModalSubmitEvent();
 		} catch (e) {
-			await this.interaction.editReply({
+			await selectMenuInteraction.update({
 				content: 'Error while updating mission',
 				components: [],
 			});
@@ -147,10 +147,10 @@ export class UpdateMissionCommandService implements ICommand {
 			},
 		});
 
-		const message = await modalInteraction.reply({
+		await modalInteraction.reply({
+			ephemeral: true,
 			content: '🚀 Notification mission updated',
 			fetchReply: true,
 		});
-		await SetDevBotReact(this.client, message);
 	}
 }

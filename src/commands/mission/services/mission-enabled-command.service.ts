@@ -2,7 +2,6 @@ import { ChatInputCommandInteraction, Client, CommandInteractionOption } from 'd
 import { isArray, isNil } from 'lodash';
 import { ICommand } from '../../../common/interfaces/command.interface';
 import { PrismaService } from '../../../common/services/prisma.service';
-import { SetDevBotReact } from '../../../common/utils/react.utils';
 import { MissionOptions } from '../enums/mission-option.enum';
 import { WordUtils } from '../utils/word.utils';
 
@@ -12,12 +11,6 @@ export class EnabledMissionCommandService implements ICommand<CommandInteraction
 		private prismaService: PrismaService,
 		private interaction: ChatInputCommandInteraction,
 	) {}
-
-	public async sendNoOptionMessage(): Promise<void> {
-		const message = await this.interaction.reply({ content: '🚀 Please input keyword', fetchReply: true });
-		await SetDevBotReact(this.client, message);
-		return;
-	}
 
 	public async execute(options: CommandInteractionOption[]): Promise<void> {
 		const optChannel = options?.find((opt) => opt.name === MissionOptions.CHANNEL) as CommandInteractionOption;
@@ -62,10 +55,10 @@ export class EnabledMissionCommandService implements ICommand<CommandInteraction
 			});
 		}
 
-		const message = await this.interaction.reply({
+		await this.interaction.reply({
 			content: '🚀 Notification mission enabled',
 			fetchReply: true,
+			ephemeral: true,
 		});
-		await SetDevBotReact(this.client, message);
 	}
 }
