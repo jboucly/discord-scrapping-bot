@@ -20,7 +20,9 @@ export class MissionDisabledCommandService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const allMissionSaved = await this.prismaService.missions.findMany();
+		const allMissionSaved = await this.prismaService.missions.findMany({
+			where: { userId: this.interaction.user.id },
+		});
 
 		if (allMissionSaved.length === 0) {
 			await this.interaction.reply({

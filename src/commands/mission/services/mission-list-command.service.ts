@@ -13,7 +13,9 @@ export class MissionListCommandService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const alreadyExist = await this.prismaService.missions.findMany();
+		const alreadyExist = await this.prismaService.missions.findMany({
+			where: { userId: this.interaction.user.id },
+		});
 
 		if (isNil(alreadyExist) || alreadyExist.length === 0) {
 			await this.interaction.reply({

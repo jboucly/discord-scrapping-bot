@@ -23,6 +23,7 @@ export class EnabledMissionCommandService implements ICommand {
 
 		const alreadyExist = await this.prismaService.missions.findFirst({
 			where: {
+				userId: this.interaction.user.id,
 				channelId: optChannel.value as string,
 			},
 		});
@@ -47,6 +48,7 @@ export class EnabledMissionCommandService implements ICommand {
 				data: {
 					createdAt: new Date(),
 					updatedAt: new Date(),
+					userId: this.interaction.user.id,
 					channelId: optChannel.value?.toString() as string,
 					channelName: (
 						this.client.channels.cache.find((channel: any) => channel.id === optChannel.value) as any
