@@ -1,7 +1,7 @@
 import { Client, Collection, Events, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 import { Commands } from '../commands';
-import { DailyCommandService } from '../commands/daily/services/daily-command.service';
-import { MissionCommandService } from '../commands/mission/services/mission-command.service';
+import { DailyCommandEvent } from '../commands/daily/events/daily-command.event';
+import { MissionCommandEvent } from '../commands/mission/events/mission-command.event';
 
 export class BotCommandEvent {
 	private collection!: Collection<
@@ -14,8 +14,8 @@ export class BotCommandEvent {
 
 	constructor(
 		private client: Client,
-		private dailyCommandService: DailyCommandService = new DailyCommandService(),
-		private missionCommandService: MissionCommandService = new MissionCommandService(),
+		private dailyCommandService: DailyCommandEvent = new DailyCommandEvent(),
+		private missionCommandService: MissionCommandEvent = new MissionCommandEvent(),
 	) {
 		this.setCollection();
 		this.setCommandEvent();
@@ -27,9 +27,9 @@ export class BotCommandEvent {
 		Commands.forEach((c) => {
 			this.collection.set(c.data.name, c);
 
+			// Start cron jobs
 			switch (c.data.name) {
 				case 'daily':
-					// If the command is daily, start the cron jobs
 					this.dailyCommandService.startCronJobs(this.client);
 					break;
 				case 'mission':

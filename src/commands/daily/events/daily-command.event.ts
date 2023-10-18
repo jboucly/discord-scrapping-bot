@@ -4,7 +4,7 @@ import { Client, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
 import { PrismaService } from '../../../common/services/prisma.service';
 
-export class DailyCommandService {
+export class DailyCommandEvent {
 	constructor(private readonly prismaService: PrismaService = new PrismaService()) {}
 
 	public async startCronJobs(client: Client): Promise<void> {
