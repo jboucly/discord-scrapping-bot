@@ -10,7 +10,6 @@ import {
 import { isNumber } from 'lodash';
 import { ICommand } from '../../../common/interfaces/command.interface';
 import { PrismaService } from '../../../common/services/prisma.service';
-import { SetDevBotReact } from '../../../common/utils/react.utils';
 
 export class MissionDisabledCommandService implements ICommand {
 	constructor(
@@ -53,20 +52,21 @@ export class MissionDisabledCommandService implements ICommand {
 		const actionRow = new ActionRowBuilder().addComponents(selectInput);
 
 		const response = await this.interaction.reply({
-			content: 'Choose mission to remove :',
+			ephemeral: true,
 			components: [actionRow as any],
+			content: 'Choose mission to remove :',
 		});
 
 		await this.setSelectEvent(response);
 	}
 
 	private async setSelectEvent(response: InteractionResponse<boolean>): Promise<void> {
-		try {
-			const confirmation = (await response.awaitMessageComponent({
-				filter: (i) => i.user.id === this.interaction.user.id,
-				time: 60000,
-			})) as StringSelectMenuInteraction;
+		const confirmation = (await response.awaitMessageComponent({
+			filter: (i) => i.user.id === this.interaction.user.id,
+			time: 60000,
+		})) as StringSelectMenuInteraction;
 
+		try {
 			const missionIdToRemove = Number(confirmation.values[0]);
 
 			if (isNumber(Number(missionIdToRemove)) && !isNaN(missionIdToRemove)) {
@@ -76,21 +76,13 @@ export class MissionDisabledCommandService implements ICommand {
 					},
 				});
 
-				const res = await this.interaction.editReply({
+				await confirmation.update({
 					content: '🚀 Notification mission removed',
 					components: [],
 				});
-				await SetDevBotReact(this.client, res);
-				return;
 			}
-
-			await this.interaction.editReply({
-				content: 'Error while removing notification mission',
-				components: [],
-			});
-			return;
 		} catch (e) {
-			await this.interaction.editReply({
+			await confirmation.update({
 				content: 'Confirmation not received within 1 minute, cancelling',
 				components: [],
 			});
