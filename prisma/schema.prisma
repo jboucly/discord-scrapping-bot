@@ -19,6 +19,7 @@ model Missions {
     channelId      String
     words          String[]
     forbiddenWords String[] @default([])
+    userId         String
 
     treaty TreatyMission[]
 }
