@@ -74,6 +74,7 @@ const MissionCommand = {
 		.addSubcommand((subcommand) =>
 			subcommand.setName(MissionOptions.LIST).setDescription('Get your mission notification configured'),
 		)
+		.addSubcommand((subcommand) => subcommand.setName(MissionOptions.UPDATE).setDescription('Update your mission'))
 		.toJSON(),
 	async execute(interaction: ChatInputCommandInteraction, client: Client) {
 		const prisma = new PrismaService();

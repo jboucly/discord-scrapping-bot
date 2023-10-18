@@ -8,7 +8,7 @@ import { FreeWorkJob, FreeWorkJobs } from '../interfaces/free-work-jobs.interfac
 import { MissionNotification, MissionToTrack } from '../interfaces/mission-notification.interface';
 import { PyloteJobs } from '../interfaces/pylote-jobs.interface';
 
-export class MissionCommandService {
+export class MissionCommandEvent {
 	constructor(private readonly prismaService: PrismaService = new PrismaService()) {}
 
 	public async startCronJobs(client: Client): Promise<void> {
