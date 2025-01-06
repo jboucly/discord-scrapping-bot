@@ -4,7 +4,7 @@ const pingCommand = {
 	data: new SlashCommandBuilder().setName('ping').setDescription('Replies with Pong!').toJSON(),
 	async execute(interaction: any, client: Client) {
 		await interaction.reply('Pong!');
-	},
+	}
 };
 
 export default pingCommand;

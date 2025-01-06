@@ -5,5 +5,5 @@ export enum MissionOptions {
 	ENABLED = 'enabled',
 	DISABLED = 'disabled',
 	LIST = 'list',
-	UPDATE = 'update',
+	UPDATE = 'update'
 }

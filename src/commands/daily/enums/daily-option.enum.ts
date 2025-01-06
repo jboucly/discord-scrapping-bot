@@ -6,5 +6,5 @@ export enum DailyOptions {
 
 	LIST = 'list',
 	ENABLED = 'enabled',
-	DISABLED = 'disabled',
+	DISABLED = 'disabled'
 }

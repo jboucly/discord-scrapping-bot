@@ -14,7 +14,7 @@ export class DailyCommandEvent {
 			cronData.forEach((daily: Daily) => {
 				const cron = new CronJob(daily.crontab, () => {
 					const channel = client.channels.cache.find(
-						(channel: any) => channel.id === daily.channelId,
+						(channel: any) => channel.id === daily.channelId
 					) as TextChannel;
 
 					if (isNil(channel)) {

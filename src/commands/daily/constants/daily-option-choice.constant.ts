@@ -24,7 +24,7 @@ export const DailyOptionsHoursChoices: APIApplicationCommandOptionChoice<number>
 	{ name: '20 h', value: 20 },
 	{ name: '21 h', value: 21 },
 	{ name: '22 h', value: 22 },
-	{ name: '23 h', value: 23 },
+	{ name: '23 h', value: 23 }
 ];
 
 export const DailyOptionsMinutesChoices: APIApplicationCommandOptionChoice<number>[] = [
@@ -83,7 +83,7 @@ export const DailyOptionsMinutesChoices: APIApplicationCommandOptionChoice<numbe
 	// { name: '52 min', value: 52 },
 	// { name: '53 min', value: 53 },
 	// { name: '54 min', value: 54 },
-	{ name: '55 min', value: 55 },
+	{ name: '55 min', value: 55 }
 	// { name: '56 min', value: 56 },
 	// { name: '57 min', value: 57 },
 	// { name: '58 min', value: 58 },

@@ -5,7 +5,7 @@ import {
 	InteractionResponse,
 	StringSelectMenuBuilder,
 	StringSelectMenuInteraction,
-	StringSelectMenuOptionBuilder,
+	StringSelectMenuOptionBuilder
 } from 'discord.js';
 import { isNumber } from 'lodash';
 import { ICommand } from '../../../common/interfaces/command.interface';
@@ -15,18 +15,18 @@ export class MissionDisabledCommandService implements ICommand {
 	constructor(
 		private client: Client,
 		private prismaService: PrismaService,
-		private interaction: ChatInputCommandInteraction,
+		private interaction: ChatInputCommandInteraction
 	) {}
 
 	public async execute(): Promise<void> {
 		const allMissionSaved = await this.prismaService.missions.findMany({
-			where: { userId: this.interaction.user.id },
+			where: { userId: this.interaction.user.id }
 		});
 
 		if (allMissionSaved.length === 0) {
 			await this.interaction.reply({
 				content: 'You have no mission notification configured',
-				ephemeral: true,
+				ephemeral: true
 			});
 			return;
 		}
@@ -46,7 +46,7 @@ export class MissionDisabledCommandService implements ICommand {
 						.setLabel(`Channel : ${mission.channelName}`)
 						.setDescription(desc)
 						.setValue(mission.id.toString());
-				}),
+				})
 			);
 
 		const actionRow = new ActionRowBuilder().addComponents(selectInput);
@@ -54,7 +54,7 @@ export class MissionDisabledCommandService implements ICommand {
 		const response = await this.interaction.reply({
 			ephemeral: true,
 			components: [actionRow as any],
-			content: 'Choose mission to remove :',
+			content: 'Choose mission to remove :'
 		});
 
 		await this.setSelectEvent(response);
@@ -63,7 +63,7 @@ export class MissionDisabledCommandService implements ICommand {
 	private async setSelectEvent(response: InteractionResponse<boolean>): Promise<void> {
 		const confirmation = (await response.awaitMessageComponent({
 			filter: (i) => i.user.id === this.interaction.user.id,
-			time: 60000,
+			time: 60000
 		})) as StringSelectMenuInteraction;
 
 		try {
@@ -72,19 +72,19 @@ export class MissionDisabledCommandService implements ICommand {
 			if (isNumber(Number(missionIdToRemove)) && !isNaN(missionIdToRemove)) {
 				await this.prismaService.missions.deleteMany({
 					where: {
-						id: missionIdToRemove,
-					},
+						id: missionIdToRemove
+					}
 				});
 
 				await confirmation.update({
 					content: '🚀 Notification mission removed',
-					components: [],
+					components: []
 				});
 			}
 		} catch (e) {
 			await confirmation.update({
 				content: 'Confirmation not received within 1 minute, cancelling',
-				components: [],
+				components: []
 			});
 			return;
 		}
