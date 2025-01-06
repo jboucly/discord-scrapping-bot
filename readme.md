@@ -68,7 +68,7 @@ $ yarn --frozen-lockfile
 
 ```bash
 # development
-$ yarn watch
+$ yarn dev
 
 # production mode
 $ yarn build && yarn start
