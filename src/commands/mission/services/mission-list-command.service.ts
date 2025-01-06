@@ -6,9 +6,9 @@ import { PrismaService } from '../../../common/services/prisma.service';
 
 export class MissionListCommandService implements ICommand {
 	constructor(
-		private client: Client,
-		private prismaService: PrismaService,
-		private interaction: ChatInputCommandInteraction
+		private readonly client: Client,
+		private readonly prismaService: PrismaService,
+		private readonly interaction: ChatInputCommandInteraction
 	) {}
 
 	public async execute(): Promise<void> {
@@ -24,7 +24,7 @@ export class MissionListCommandService implements ICommand {
 			return;
 		}
 
-		await this.interaction.reply({ embeds: this.createEmbeds(alreadyExist), fetchReply: true, ephemeral: true });
+		await this.interaction.reply({ embeds: this.createEmbeds(alreadyExist), withResponse: true, ephemeral: true });
 	}
 
 	private createEmbeds(missions: Missions[]): EmbedBuilder[] {

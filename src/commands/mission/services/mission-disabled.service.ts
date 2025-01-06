@@ -13,9 +13,9 @@ import { PrismaService } from '../../../common/services/prisma.service';
 
 export class MissionDisabledCommandService implements ICommand {
 	constructor(
-		private client: Client,
-		private prismaService: PrismaService,
-		private interaction: ChatInputCommandInteraction
+		private readonly client: Client,
+		private readonly prismaService: PrismaService,
+		private readonly interaction: ChatInputCommandInteraction
 	) {}
 
 	public async execute(): Promise<void> {

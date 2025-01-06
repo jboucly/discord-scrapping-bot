@@ -20,9 +20,9 @@ export class UpdateMissionCommandService implements ICommand {
 	private missionToUpdate!: Missions;
 
 	constructor(
-		private client: Client,
-		private prismaService: PrismaService,
-		private interaction: ChatInputCommandInteraction
+		private readonly client: Client,
+		private readonly prismaService: PrismaService,
+		private readonly interaction: ChatInputCommandInteraction
 	) {}
 
 	public async execute(): Promise<void> {
@@ -150,7 +150,7 @@ export class UpdateMissionCommandService implements ICommand {
 		await modalInteraction.reply({
 			ephemeral: true,
 			content: '🚀 Notification mission updated',
-			fetchReply: true
+			withResponse: true
 		});
 	}
 }
