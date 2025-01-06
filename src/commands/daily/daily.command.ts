@@ -163,7 +163,7 @@ const DailyCommand = {
 
 			const message = await interaction.reply({
 				content: isUpdated ? '✅ Daily updated' : '✅ Daily configured',
-				fetchReply: true
+				withResponse: true
 			});
 			await SetDevBotReact(client, message);
 		} else if (isMissionList) {
@@ -174,8 +174,8 @@ const DailyCommand = {
 				return;
 			}
 
-			const message = await interaction.reply({ embeds: createEmbeds(alreadyExist), fetchReply: true });
-			await SetDevBotReact(client, message);
+			const message = await interaction.reply({ embeds: createEmbeds(alreadyExist), withResponse: true });
+			await SetDevBotReact(client, message as any);
 		} else if (isDisabled) {
 			const allDaily = await prisma.daily.findMany();
 
