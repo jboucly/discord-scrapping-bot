@@ -7,7 +7,7 @@
 			"request": "launch",
 			"name": "Start Debug",
 			"runtimeExecutable": "yarn",
-			"runtimeArgs": ["watch"],
+			"runtimeArgs": ["dev"],
 			"console": "integratedTerminal",
 			"autoAttachChildProcesses": true,
 			"outFiles": ["${workspaceFolder}/**/*.js", "!**/node_modules/**"]

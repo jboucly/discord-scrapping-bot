@@ -23,7 +23,8 @@ export class DiscordClient {
 				GatewayIntentBits.GuildMessages,
 				GatewayIntentBits.DirectMessages,
 				GatewayIntentBits.MessageContent,
-				GatewayIntentBits.GuildModeration
+				GatewayIntentBits.GuildModeration,
+				GatewayIntentBits.GuildPresences
 			]
 		});
 	}
