@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
+import { ChannelType, ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
 import { MissionOptions } from './enums/mission-option.enum';
 import { MissionCommandService } from './services/mission-command.service';
 
@@ -18,6 +18,7 @@ export default {
 						.setName(MissionOptions.CHANNEL)
 						.setDescription('Set channel to send missions')
 						.setRequired(true)
+						.addChannelTypes(ChannelType.GuildText)
 				)
 				.addStringOption((opts) =>
 					opts

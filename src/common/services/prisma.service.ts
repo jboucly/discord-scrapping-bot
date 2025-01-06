@@ -16,7 +16,7 @@ type PrismaServiceLog = [
 	{
 		emit: 'stdout';
 		level: 'warn';
-	},
+	}
 ];
 
 export class PrismaService extends PrismaClient<{ log: PrismaServiceLog }> {
@@ -25,21 +25,21 @@ export class PrismaService extends PrismaClient<{ log: PrismaServiceLog }> {
 			log: [
 				{
 					emit: 'event',
-					level: 'query',
+					level: 'query'
 				},
 				{
 					emit: 'event',
-					level: 'error',
+					level: 'error'
 				},
 				{
 					emit: 'stdout',
-					level: 'info',
+					level: 'info'
 				},
 				{
 					emit: 'stdout',
-					level: 'warn',
-				},
-			],
+					level: 'warn'
+				}
+			]
 		});
 	}
 

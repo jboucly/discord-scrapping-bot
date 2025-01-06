@@ -2,6 +2,7 @@ import { Daily } from '@prisma/client';
 import { CronJob } from 'cron';
 import {
 	ActionRowBuilder,
+	ChannelType,
 	ChatInputCommandInteraction,
 	Client,
 	CommandInteractionOption,
@@ -10,7 +11,7 @@ import {
 	StringSelectMenuBuilder,
 	StringSelectMenuInteraction,
 	StringSelectMenuOptionBuilder,
-	TextChannel,
+	TextChannel
 } from 'discord.js';
 import { isNaN, isNil, isNumber } from 'lodash';
 import { PrismaService } from '../../common/services/prisma.service';
@@ -50,35 +51,37 @@ const DailyCommand = {
 						.setName(DailyOptions.HOUR)
 						.setDescription('Set hour of daily')
 						.setRequired(true)
-						.addChoices(...DailyOptionsHoursChoices),
+						.addChoices(...DailyOptionsHoursChoices)
 				)
 				.addIntegerOption((opts) =>
 					opts
 						.setName(DailyOptions.MINUTE)
 						.setDescription('Set minute of daily')
 						.setRequired(true)
-						.addChoices(...DailyOptionsMinutesChoices),
+						.addChoices(...DailyOptionsMinutesChoices)
 				)
 				.addStringOption((opts) =>
 					opts
 						.setRequired(true)
 						.setName(DailyOptions.MESSAGE)
-						.setDescription('Save the message you want to receive in the daily'),
+						.setDescription('Save the message you want to receive in the daily')
 				)
 				.addChannelOption((opts) =>
 					opts
 						.setRequired(true)
 						.setName(DailyOptions.CHANNEL)
-						.setDescription('Save the channel you want to receive the daily'),
-				),
+						.setDescription('Save the channel you want to receive the daily')
+						.addChannelTypes(ChannelType.GuildText)
+				)
 		)
 		.addSubcommand((subcommand) =>
-			subcommand.setName(DailyOptions.DISABLED).setDescription('Disable daily notification'),
+			subcommand.setName(DailyOptions.DISABLED).setDescription('Disable daily notification')
 		)
 		.addSubcommand((subcommand) =>
-			subcommand.setName(DailyOptions.LIST).setDescription('Get your daily notification configured'),
+			subcommand.setName(DailyOptions.LIST).setDescription('Get your daily notification configured')
 		)
 		.toJSON(),
+
 	async execute(interaction: ChatInputCommandInteraction, client: Client) {
 		let isUpdated = false;
 		const prisma = new PrismaService();
@@ -89,16 +92,16 @@ const DailyCommand = {
 
 		if (isEnabled) {
 			const optHour = isEnabled.options?.find(
-				(opt) => opt.name === DailyOptions.HOUR,
+				(opt) => opt.name === DailyOptions.HOUR
 			) as CommandInteractionOption;
 			const optMin = isEnabled.options?.find(
-				(opt) => opt.name === DailyOptions.MINUTE,
+				(opt) => opt.name === DailyOptions.MINUTE
 			) as CommandInteractionOption;
 			const optChannel = isEnabled.options?.find(
-				(opt) => opt.name === DailyOptions.CHANNEL,
+				(opt) => opt.name === DailyOptions.CHANNEL
 			) as CommandInteractionOption;
 			const optMessage = isEnabled.options?.find(
-				(opt) => opt.name === DailyOptions.MESSAGE,
+				(opt) => opt.name === DailyOptions.MESSAGE
 			) as CommandInteractionOption;
 
 			if (isNil(optHour.value) || isNil(optMin.value)) {
@@ -110,26 +113,25 @@ const DailyCommand = {
 				time: `00 ${optMin.value} ${optHour.value} * * *`,
 				message: optMessage.value as string,
 				channelId: optChannel.value as string,
-				chanelName: (client.channels.cache.find((channel: any) => channel.id === optChannel.value) as any)
-					?.name,
+				chanelName: (client.channels.cache.find((channel: any) => channel.id === optChannel.value) as any)?.name
 			};
 
 			const res = await prisma.daily.findFirst({
 				where: {
 					crontab: dailyToSave.time,
-					channelId: dailyToSave.channelId,
-				},
+					channelId: dailyToSave.channelId
+				}
 			});
 
 			if (!isNil(res)) {
 				isUpdated = true;
 				await prisma.daily.update({
 					where: {
-						id: res.id,
+						id: res.id
 					},
 					data: {
-						message: dailyToSave.message,
-					},
+						message: dailyToSave.message
+					}
 				});
 			} else {
 				await prisma.daily.create({
@@ -139,14 +141,14 @@ const DailyCommand = {
 						crontab: dailyToSave.time,
 						channelId: dailyToSave.channelId,
 						message: dailyToSave.message,
-						channelName: dailyToSave.chanelName,
-					},
+						channelName: dailyToSave.chanelName
+					}
 				});
 			}
 
 			const cron = new CronJob(dailyToSave.time, async () => {
 				const channel = client.channels.cache.find(
-					(channel: any) => channel.id === dailyToSave.channelId,
+					(channel: any) => channel.id === dailyToSave.channelId
 				) as TextChannel;
 
 				if (isNil(channel)) {
@@ -161,7 +163,7 @@ const DailyCommand = {
 
 			const message = await interaction.reply({
 				content: isUpdated ? '✅ Daily updated' : '✅ Daily configured',
-				fetchReply: true,
+				fetchReply: true
 			});
 			await SetDevBotReact(client, message);
 		} else if (isMissionList) {
@@ -190,21 +192,21 @@ const DailyCommand = {
 						new StringSelectMenuOptionBuilder()
 							.setLabel(TransformCrontab.toString(daily.crontab, { verbose: true }))
 							.setDescription(daily.message)
-							.setValue(daily.id.toString()),
-					),
+							.setValue(daily.id.toString())
+					)
 				);
 
 			const actionRow = new ActionRowBuilder().addComponents(selectInput);
 
 			const response = await interaction.reply({
 				content: 'Choose daily to remove :',
-				components: [actionRow as any],
+				components: [actionRow as any]
 			});
 
 			try {
 				const confirmation = (await response.awaitMessageComponent({
 					filter: (i) => i.user.id === interaction.user.id,
-					time: 60000,
+					time: 60000
 				})) as StringSelectMenuInteraction;
 
 				const dailyIdToRemove = Number(confirmation.values[0]);
@@ -212,13 +214,13 @@ const DailyCommand = {
 				if (isNumber(Number(dailyIdToRemove)) && !isNaN(dailyIdToRemove)) {
 					await prisma.daily.deleteMany({
 						where: {
-							id: dailyIdToRemove,
-						},
+							id: dailyIdToRemove
+						}
 					});
 
 					const res = await interaction.editReply({
 						content: '🚀 Daily removed',
-						components: [],
+						components: []
 					});
 					await SetDevBotReact(client, res);
 					return;
@@ -226,18 +228,18 @@ const DailyCommand = {
 
 				await interaction.editReply({
 					content: 'Error while removing daily',
-					components: [],
+					components: []
 				});
 				return;
 			} catch (e) {
 				await interaction.editReply({
 					content: 'Confirmation not received within 1 minute, cancelling',
-					components: [],
+					components: []
 				});
 				return;
 			}
 		}
-	},
+	}
 };
 
 export default DailyCommand;

@@ -1,32 +1,32 @@
-import { ChatInputCommandInteraction, Client, CommandInteractionOption } from 'discord.js';
+import { CacheType, ChatInputCommandInteraction, Client, CommandInteractionOption } from 'discord.js';
 import { isArray, isNil } from 'lodash';
-import { ICommand } from '../../../common/interfaces/command.interface';
 import { PrismaService } from '../../../common/services/prisma.service';
 import { MissionOptions } from '../enums/mission-option.enum';
 import { WordUtils } from '../utils/word.utils';
 
-export class EnabledMissionCommandService implements ICommand {
+export class EnabledMissionCommandService /*implements ICommand*/ {
 	constructor(
 		private readonly client: Client,
 		private readonly prismaService: PrismaService,
 		private readonly interaction: ChatInputCommandInteraction
 	) {}
 
-	public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-		const optChannel = interaction.options.get(MissionOptions.CHANNEL) as CommandInteractionOption;
+	public async execute(optChannel: readonly CommandInteractionOption<CacheType>[]): Promise<void> {
+		const channelId = optChannel.find((e) => e.name === MissionOptions.CHANNEL)?.value as string;
+		const wordsChoiced = optChannel.find((e) => e.name === MissionOptions.WORDS)?.value as string;
+		const forbiddenWordsChoiced = optChannel.find((e) => e.name === MissionOptions.FORBIDDEN_WORDS)
+			?.value as string;
 
 		const alreadyExist = await this.prismaService.missions.findFirst({
 			where: {
 				userId: this.interaction.user.id,
-				channelId: optChannel.value as string
+				channelId: channelId
 			}
 		});
 
 		if (!isNil(alreadyExist)) {
-			const newWords = WordUtils.getWords(interaction.options.get(MissionOptions.WORDS)?.value as string);
-			const newForbiddenWords = WordUtils.getWords(
-				interaction.options.get(MissionOptions.FORBIDDEN_WORDS)?.value as string
-			);
+			const newWords = WordUtils.getWords(wordsChoiced);
+			const newForbiddenWords = WordUtils.getWords(forbiddenWordsChoiced);
 
 			let words: string[] = isArray(newWords) ? newWords : [newWords];
 			let forbiddenWords: string[] = isArray(newForbiddenWords) ? newForbiddenWords : [newForbiddenWords];
@@ -40,17 +40,14 @@ export class EnabledMissionCommandService implements ICommand {
 		} else {
 			await this.prismaService.missions.create({
 				data: {
+					channelId,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 					userId: this.interaction.user.id,
-					channelId: optChannel.value?.toString() as string,
-					channelName: (
-						this.client.channels.cache.find((channel: any) => channel.id === optChannel.value) as any
-					)?.name,
-					words: WordUtils.getWords(interaction.options.get(MissionOptions.WORDS)?.value as string),
-					forbiddenWords: WordUtils.getWords(
-						interaction.options.get(MissionOptions.FORBIDDEN_WORDS)?.value as string
-					)
+					channelName: (this.client.channels.cache.find((channel: any) => channel.id === channelId) as any)
+						?.name,
+					words: WordUtils.getWords(wordsChoiced),
+					forbiddenWords: WordUtils.getWords(forbiddenWordsChoiced)
 				}
 			});
 		}
@@ -58,7 +55,8 @@ export class EnabledMissionCommandService implements ICommand {
 		await this.interaction.reply({
 			content: '🚀 Notification mission enabled',
 			fetchReply: true,
-			ephemeral: true
+			ephemeral: true,
+			withResponse: true
 		});
 	}
 }

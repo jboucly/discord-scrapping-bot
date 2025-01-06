@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 
+import { Missions } from '@prisma/client';
 import { CronJob } from 'cron';
 import { format } from 'date-fns';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
@@ -21,71 +22,55 @@ export class MissionCommandEvent {
 		});
 
 		cron.start();
-		console.info('ℹ️  Mission Cron jobs started');
+		console.info('ℹ️  Mission Cron jobs started with crontab :', crontab);
 	}
 
 	public async sendMissionNotification(client: Client): Promise<void> {
-		let allMissions: MissionToTrack[] = [...(await this.getPyloteMission()), ...(await this.getFreeWorkMission())];
+		let allMissions: MissionToTrack[] = [...(await this.getFreeWorkMission())];
 
 		const allMissionSearch = await this.prismaService.missions.findMany({ include: { treaty: true } });
+		if (allMissionSearch.length === 0) return;
 
-		if (allMissionSearch.length > 0) {
-			for (let i = 0; i < allMissionSearch.length; i++) {
-				const missionSearch = allMissionSearch[i];
+		for (const missionSearch of allMissionSearch) {
+			for (const missionToTrack of allMissions) {
+				const idToRemove = missionSearch.treaty.map((t) => t.missionTreatyId);
+				const missionToSend = missionToTrack.missions.filter((m) => !idToRemove.includes(m.id));
+				const embedMessages = this.createEmbeds(missionToSend);
 
-				for (let j = 0; j < allMissions.length; j++) {
-					const missionToTrack = allMissions[j];
+				const channel = client.channels.cache.find(
+					(channel: any) => channel.id === missionSearch.channelId
+				) as TextChannel;
 
-					const idToRemove = missionSearch.treaty.map((t) => t.missionTreatyId);
-					const missionToSend = missionToTrack.missions.filter((m) => !idToRemove.includes(m.id));
-					const embedMessages = this.createEmbeds(missionToSend);
+				if (isNil(channel)) {
+					console.error('Channel not found');
+					return;
+				}
 
-					const channel = client.channels.cache.find(
-						(channel: any) => channel.id === missionSearch.channelId
-					) as TextChannel;
+				const nbMessage = embedMessages.length;
+				await this.saveTreastyMission(missionToSend, missionSearch);
 
-					if (isNil(channel)) {
-						console.error('Channel not found');
-						return;
-					}
+				if (embedMessages.length > 10) {
+					let messageToSend = embedMessages;
 
-					const nbMessage = embedMessages.length;
-
-					if (embedMessages.length > 10) {
-						let messageToSend = embedMessages;
-
-						while (messageToSend.length > 0) {
-							await channel.send({
-								embeds: messageToSend.splice(0, 10),
-								content: 'Nouvelle mission disponible ! 🚀'
-							});
-						}
-					} else if (embedMessages.length > 0) {
+					while (messageToSend.length > 0) {
 						await channel.send({
-							embeds: embedMessages,
+							embeds: messageToSend.splice(0, 10),
 							content: 'Nouvelle mission disponible ! 🚀'
 						});
 					}
-					console.info(
-						`ℹ️  ${nbMessage} missions notification send to ${channel.name}: ${channel.id}\n⏰ ${format(
-							new Date(),
-							'dd/MM/yyyy HH:mm:ss'
-						)}\n———————————————————————————————————————————————————————————`
-					);
-
-					if (missionToSend.length > 0) {
-						await this.prismaService.treatyMission.createMany({
-							data: missionToSend.map((m) => ({
-								createdAt: new Date(),
-								updatedAt: new Date(),
-								url: m?.url,
-								name: m?.name,
-								missionTreatyId: m.id,
-								missionId: missionSearch.id
-							}))
-						});
-					}
+				} else if (embedMessages.length > 0) {
+					await channel.send({
+						embeds: embedMessages,
+						content: 'Nouvelle mission disponible ! 🚀'
+					});
 				}
+
+				console.info(
+					`ℹ️  ${nbMessage} missions notification send to ${channel.name}: ${channel.id}\n⏰ ${format(
+						new Date(),
+						'dd/MM/yyyy HH:mm:ss'
+					)}\n———————————————————————————————————————————————————————————`
+				);
 			}
 		}
 	}
@@ -93,9 +78,7 @@ export class MissionCommandEvent {
 	private createEmbeds(missions: MissionNotification[]): EmbedBuilder[] {
 		const valToReturn: EmbedBuilder[] = [];
 
-		for (let i = 0; i < missions.length; i++) {
-			const mission = missions[i];
-
+		for (const mission of missions) {
 			const embed = new EmbedBuilder()
 				.setColor(mission.from === 'pylote' ? '#8FFFD0' : '#F76C01')
 				.setTitle(`➡️ ${mission.name}`)
@@ -119,7 +102,7 @@ export class MissionCommandEvent {
 				}
 
 				if (!isNil(mission.skills) && mission.skills?.length > 0) {
-					embed.addFields({ name: 'Compétences', value: mission.skills?.join(', ') as string });
+					embed.addFields({ name: 'Compétences', value: mission.skills?.join(', ') });
 				}
 			}
 
@@ -134,19 +117,15 @@ export class MissionCommandEvent {
 		const allMissionSearch = await this.prismaService.missions.findMany();
 
 		if (!isNil(process.env.FREE_WORK_URL) && !isNil(allMissionSearch)) {
-			for (let i = 0; i < allMissionSearch.length; i++) {
-				const missionSearch = allMissionSearch[i];
+			for (const missionSearch of allMissionSearch) {
 				const toReturn: MissionToTrack = { channelId: missionSearch.channelId, missions: [] };
+
 				const response = await fetch(
-					`${process.env.FREE_WORK_URL}?contracts=contractor&searchKeywords=${missionSearch.words.join(
-						','
-					)}&order=date&page=1&itemsPerPage=20`
+					`${process.env.FREE_WORK_URL}?contracts=contractor&searchKeywords=${missionSearch.words.join(',')}&order=date&page=1&itemsPerPage=20`
 				);
 				const jobs = (await response.json()) as FreeWorkJobs;
 
-				for (let j = 0; j < jobs['hydra:member'].length; j++) {
-					const job = jobs['hydra:member'][j];
-
+				for (const job of jobs['hydra:member']) {
 					if (this.checkNotContainForbiddenWord(job, missionSearch.forbiddenWords)) {
 						toReturn.missions.push({
 							id: `${job.id}`,
@@ -173,6 +152,9 @@ export class MissionCommandEvent {
 		return valToReturn;
 	}
 
+	/**
+	 * @deprecated Pylote is not implemented yet
+	 */
 	private async getPyloteMission(): Promise<MissionToTrack[]> {
 		const valToReturn: MissionToTrack[] = [];
 		const allMissionSearch = await this.prismaService.missions.findMany();
@@ -181,13 +163,10 @@ export class MissionCommandEvent {
 			const response = await fetch(process.env.PYLOTE_URL);
 			const jobs = (await response.json()) as PyloteJobs[];
 
-			for (let i = 0; i < allMissionSearch.length; i++) {
-				const missionSearch = allMissionSearch[i];
+			for (const missionSearch of allMissionSearch) {
 				const toReturn: MissionToTrack = { channelId: missionSearch.channelId, missions: [] };
 
-				for (let i = 0; i < jobs.length; i++) {
-					const job = jobs[i];
-
+				for (const job of jobs) {
 					if (
 						missionSearch.words.find((w) => job.Title.toLocaleLowerCase().includes(w.toLocaleLowerCase()))
 					) {
@@ -214,14 +193,30 @@ export class MissionCommandEvent {
 	private checkNotContainForbiddenWord(job: FreeWorkJob, forbiddenWords: string[]): boolean {
 		if (forbiddenWords.length === 0) return true;
 
-		for (let i = 0; i < forbiddenWords.length; i++) {
-			const forbiddenWord = forbiddenWords[i];
-
+		for (const forbiddenWord of forbiddenWords) {
 			if (job.title.toLocaleLowerCase().includes(forbiddenWord.toLocaleLowerCase())) {
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * @description Save the mission in the database if it's not already saved
+	 */
+	private async saveTreastyMission(missionToSend: MissionNotification[], missionSearch: Missions): Promise<void> {
+		if (missionToSend.length > 0) {
+			await this.prismaService.treatyMission.createMany({
+				data: missionToSend.map((m) => ({
+					createdAt: new Date(),
+					updatedAt: new Date(),
+					url: m?.url,
+					name: m?.name,
+					missionTreatyId: m.id,
+					missionId: missionSearch.id
+				}))
+			});
+		}
 	}
 }

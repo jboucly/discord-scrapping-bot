@@ -13,9 +13,9 @@ export const CommandOptionsUtils = {
 
 	getNotRequired(
 		interaction: ChatInputCommandInteraction | undefined,
-		name: string,
+		name: string
 	): CommandInteractionOption | undefined {
 		if (!interaction) return undefined;
 		return interaction.options.data.find((e) => e.name === name);
-	},
+	}
 };

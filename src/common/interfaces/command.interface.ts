@@ -1,6 +1,6 @@
-import { ChatInputCommandInteraction, Client } from 'discord.js';
+import { CacheType, Client, CommandInteractionOption } from 'discord.js';
 
-export interface ICommand<K = ChatInputCommandInteraction> {
+export interface ICommand<K = readonly CommandInteractionOption<CacheType>[]> {
 	execute(options?: K): Promise<void>;
-	execute(interaction: K, client: Client): Promise<void>;
+	execute(optChannel: K, client: Client): Promise<void>;
 }
