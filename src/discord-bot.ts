@@ -6,30 +6,33 @@ import { BotGlobalEvent } from './events/bot-global.event';
 export class DiscordClient {
 	public client!: Client;
 
-	private token = process.env.TOKEN || null;
+	private readonly token = process.env.TOKEN ?? null;
 
 	constructor() {
 		this.createClient();
-		this.runBot();
+	}
+
+	public async init(): Promise<void> {
+		await this.runBot();
 	}
 
 	private createClient(): void {
 		this.client = new Client({
 			intents: [
 				GatewayIntentBits.Guilds,
-				GatewayIntentBits.GuildBans,
 				GatewayIntentBits.GuildMessages,
 				GatewayIntentBits.DirectMessages,
 				GatewayIntentBits.MessageContent,
-			],
+				GatewayIntentBits.GuildModeration
+			]
 		});
 	}
 
 	private async runBot(): Promise<void> {
 		if (isNil(this.token)) throw new Error('Token is null');
-
 		await this.client.login(this.token);
-		new BotGlobalEvent(this.client);
-		new BotCommandEvent(this.client);
+
+		new BotGlobalEvent(this.client).init();
+		new BotCommandEvent(this.client).init();
 	}
 }

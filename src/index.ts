@@ -3,18 +3,19 @@ import express from 'express';
 import { DiscordClient } from './discord-bot';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT ?? 3000;
 
 app.use(express.json());
 // Run discord bot
-new DiscordClient();
+const client = new DiscordClient();
+client.init();
 
-app.get('/', async function (req, res) {
-	return res.send({
+app.get('/', (_req, res) => {
+	res.send({
 		type: 'InteractionResponse',
 		data: {
-			content: 'hello world 🚀',
-		},
+			content: 'hello world 🚀'
+		}
 	});
 });
 

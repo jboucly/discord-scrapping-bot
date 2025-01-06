@@ -1,7 +1,9 @@
 import { Client, Events } from 'discord.js';
 
 export class BotGlobalEvent {
-	constructor(private client: Client) {
+	constructor(private readonly client: Client) {}
+
+	public init(): void {
 		this.setEventOnRunBot();
 		this.setPingEvent();
 	}

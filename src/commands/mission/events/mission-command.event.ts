@@ -1,8 +1,9 @@
+import fetch from 'node-fetch';
+
 import { CronJob } from 'cron';
 import { format } from 'date-fns';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
-import fetch from 'node-fetch';
 import { PrismaService } from '../../../common/services/prisma.service';
 import { FreeWorkJob, FreeWorkJobs } from '../interfaces/free-work-jobs.interface';
 import { MissionNotification, MissionToTrack } from '../interfaces/mission-notification.interface';
@@ -40,7 +41,7 @@ export class MissionCommandEvent {
 					const embedMessages = this.createEmbeds(missionToSend);
 
 					const channel = client.channels.cache.find(
-						(channel: any) => channel.id === missionSearch.channelId,
+						(channel: any) => channel.id === missionSearch.channelId
 					) as TextChannel;
 
 					if (isNil(channel)) {
@@ -56,20 +57,20 @@ export class MissionCommandEvent {
 						while (messageToSend.length > 0) {
 							await channel.send({
 								embeds: messageToSend.splice(0, 10),
-								content: 'Nouvelle mission disponible ! 🚀',
+								content: 'Nouvelle mission disponible ! 🚀'
 							});
 						}
 					} else if (embedMessages.length > 0) {
 						await channel.send({
 							embeds: embedMessages,
-							content: 'Nouvelle mission disponible ! 🚀',
+							content: 'Nouvelle mission disponible ! 🚀'
 						});
 					}
 					console.info(
 						`ℹ️  ${nbMessage} missions notification send to ${channel.name}: ${channel.id}\n⏰ ${format(
 							new Date(),
-							'dd/MM/yyyy HH:mm:ss',
-						)}\n———————————————————————————————————————————————————————————`,
+							'dd/MM/yyyy HH:mm:ss'
+						)}\n———————————————————————————————————————————————————————————`
 					);
 
 					if (missionToSend.length > 0) {
@@ -80,8 +81,8 @@ export class MissionCommandEvent {
 								url: m?.url,
 								name: m?.name,
 								missionTreatyId: m.id,
-								missionId: missionSearch.id,
-							})),
+								missionId: missionSearch.id
+							}))
 						});
 					}
 				}
@@ -104,7 +105,7 @@ export class MissionCommandEvent {
 					{ name: 'Durée', value: `${mission.durationMonth} mois`, inline: true },
 					{ name: 'Ville', value: `${mission.city}`, inline: true },
 					{ name: 'Plateforme', value: `${mission.platform}`, inline: true },
-					{ name: 'Date', value: `${format(new Date(mission.date), 'dd/MM/yyyy')}`, inline: true },
+					{ name: 'Date', value: `${format(new Date(mission.date), 'dd/MM/yyyy')}`, inline: true }
 				])
 				.setTimestamp();
 
@@ -113,7 +114,7 @@ export class MissionCommandEvent {
 
 				if (!isNil(mission.description)) {
 					embed.setDescription(
-						mission.description.length > 100 ? mission.description.slice(0, 100) : mission.description,
+						mission.description.length > 100 ? mission.description.slice(0, 100) : mission.description
 					);
 				}
 
@@ -138,8 +139,8 @@ export class MissionCommandEvent {
 				const toReturn: MissionToTrack = { channelId: missionSearch.channelId, missions: [] };
 				const response = await fetch(
 					`${process.env.FREE_WORK_URL}?contracts=contractor&searchKeywords=${missionSearch.words.join(
-						',',
-					)}&order=date&page=1&itemsPerPage=20`,
+						','
+					)}&order=date&page=1&itemsPerPage=20`
 				);
 				const jobs = (await response.json()) as FreeWorkJobs;
 
@@ -160,7 +161,7 @@ export class MissionCommandEvent {
 							durationMonth: job?.durationValue
 								? `${job?.durationValue} ${job?.durationPeriod}`
 								: 'Non mentionné',
-							url: `https://www.free-work.com/fr/tech-it/${job.job.slug}/job-mission/${job.slug}`,
+							url: `https://www.free-work.com/fr/tech-it/${job.job.slug}/job-mission/${job.slug}`
 						});
 					}
 				}
@@ -198,7 +199,7 @@ export class MissionCommandEvent {
 							date: job.Date,
 							city: job.Ville,
 							platform: job.Plateforme,
-							durationMonth: job.Durée_mois,
+							durationMonth: job.Durée_mois
 						});
 					}
 				}

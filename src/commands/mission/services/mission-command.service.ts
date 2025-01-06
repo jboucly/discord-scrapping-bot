@@ -11,32 +11,30 @@ import { UpdateMissionCommandService } from './update-mission-command.service';
 
 export class MissionCommandService implements ICommand {
 	constructor(
-		private client: Client,
-		private interaction: ChatInputCommandInteraction,
-		private prismaService: PrismaService = new PrismaService(),
-		private enabledMissionCommandService: EnabledMissionCommandService = new EnabledMissionCommandService(
+		private readonly client: Client,
+		private readonly interaction: ChatInputCommandInteraction,
+		private readonly prismaService: PrismaService = new PrismaService(),
+		private readonly enabledMissionCommandService: EnabledMissionCommandService = new EnabledMissionCommandService(
 			client,
 			prismaService,
-			interaction,
+			interaction
 		),
-		private missionListCommandService: MissionListCommandService = new MissionListCommandService(
+		private readonly missionListCommandService: MissionListCommandService = new MissionListCommandService(
 			client,
 			prismaService,
-			interaction,
+			interaction
 		),
-		private missionDisabledCommandService: MissionDisabledCommandService = new MissionDisabledCommandService(
+		private readonly missionDisabledCommandService: MissionDisabledCommandService = new MissionDisabledCommandService(
 			client,
 			prismaService,
-			interaction,
+			interaction
 		),
-		private updateMissionCommandService: UpdateMissionCommandService = new UpdateMissionCommandService(
+		private readonly updateMissionCommandService: UpdateMissionCommandService = new UpdateMissionCommandService(
 			client,
 			prismaService,
-			interaction,
-		),
-	) {
-		this.execute();
-	}
+			interaction
+		)
+	) {}
 
 	public async execute(): Promise<void> {
 		const isEnabled = CommandOptionsUtils.getNotRequired(this.interaction, MissionOptions.ENABLED);
@@ -48,8 +46,8 @@ export class MissionCommandService implements ICommand {
 			return await this.missionListCommandService.execute();
 		} else if (isDisabled) {
 			return await this.missionDisabledCommandService.execute();
-		} else if (isEnabled && isEnabled.options) {
-			return await this.enabledMissionCommandService.execute(isEnabled.options);
+		} else if (isEnabled?.options) {
+			return await this.enabledMissionCommandService.execute(isEnabled.options as any);
 		} else if (isToUpdate) {
 			return await this.updateMissionCommandService.execute();
 		}

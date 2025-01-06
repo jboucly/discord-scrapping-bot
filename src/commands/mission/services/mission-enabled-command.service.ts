@@ -5,27 +5,27 @@ import { PrismaService } from '../../../common/services/prisma.service';
 import { MissionOptions } from '../enums/mission-option.enum';
 import { WordUtils } from '../utils/word.utils';
 
-export class EnabledMissionCommandService implements ICommand<CommandInteractionOption[]> {
+export class EnabledMissionCommandService implements ICommand {
 	constructor(
-		private client: Client,
-		private prismaService: PrismaService,
-		private interaction: ChatInputCommandInteraction,
+		private readonly client: Client,
+		private readonly prismaService: PrismaService,
+		private readonly interaction: ChatInputCommandInteraction
 	) {}
 
-	public async execute(options: CommandInteractionOption[]): Promise<void> {
-		const optChannel = options?.find((opt) => opt.name === MissionOptions.CHANNEL) as CommandInteractionOption;
+	public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+		const optChannel = interaction.options.get(MissionOptions.CHANNEL) as CommandInteractionOption;
 
 		const alreadyExist = await this.prismaService.missions.findFirst({
 			where: {
 				userId: this.interaction.user.id,
-				channelId: optChannel.value as string,
-			},
+				channelId: optChannel.value as string
+			}
 		});
 
 		if (!isNil(alreadyExist)) {
-			const newWords = WordUtils.getWords(options.find((e) => e.name === MissionOptions.WORDS)?.value as string);
+			const newWords = WordUtils.getWords(interaction.options.get(MissionOptions.WORDS)?.value as string);
 			const newForbiddenWords = WordUtils.getWords(
-				options.find((e) => e.name === MissionOptions.FORBIDDEN_WORDS)?.value as string,
+				interaction.options.get(MissionOptions.FORBIDDEN_WORDS)?.value as string
 			);
 
 			let words: string[] = isArray(newWords) ? newWords : [newWords];
@@ -33,9 +33,9 @@ export class EnabledMissionCommandService implements ICommand<CommandInteraction
 
 			await this.prismaService.missions.update({
 				where: {
-					id: alreadyExist.id,
+					id: alreadyExist.id
 				},
-				data: { words, forbiddenWords },
+				data: { words, forbiddenWords }
 			});
 		} else {
 			await this.prismaService.missions.create({
@@ -47,18 +47,18 @@ export class EnabledMissionCommandService implements ICommand<CommandInteraction
 					channelName: (
 						this.client.channels.cache.find((channel: any) => channel.id === optChannel.value) as any
 					)?.name,
-					words: WordUtils.getWords(options.find((e) => e.name === MissionOptions.WORDS)?.value as string),
+					words: WordUtils.getWords(interaction.options.get(MissionOptions.WORDS)?.value as string),
 					forbiddenWords: WordUtils.getWords(
-						options.find((e) => e.name === MissionOptions.FORBIDDEN_WORDS)?.value as string,
-					),
-				},
+						interaction.options.get(MissionOptions.FORBIDDEN_WORDS)?.value as string
+					)
+				}
 			});
 		}
 
 		await this.interaction.reply({
 			content: '🚀 Notification mission enabled',
 			fetchReply: true,
-			ephemeral: true,
+			ephemeral: true
 		});
 	}
 }

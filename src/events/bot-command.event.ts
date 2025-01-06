@@ -13,10 +13,12 @@ export class BotCommandEvent {
 	>;
 
 	constructor(
-		private client: Client,
-		private dailyCommandService: DailyCommandEvent = new DailyCommandEvent(),
-		private missionCommandService: MissionCommandEvent = new MissionCommandEvent(),
-	) {
+		private readonly client: Client,
+		private readonly dailyCommandService: DailyCommandEvent = new DailyCommandEvent(),
+		private readonly missionCommandService: MissionCommandEvent = new MissionCommandEvent()
+	) {}
+
+	public init(): void {
 		this.setCollection();
 		this.setCommandEvent();
 	}
@@ -55,7 +57,7 @@ export class BotCommandEvent {
 				console.error(error);
 				await interaction.reply({
 					content: 'There was an error while executing this command!',
-					ephemeral: true,
+					ephemeral: true
 				});
 			}
 		});
