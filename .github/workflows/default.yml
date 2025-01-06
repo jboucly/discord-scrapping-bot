@@ -10,8 +10,7 @@ on:
 jobs:
     default:
         container:
-            image: node:18.15.0
-
+            image: node:22.11.0
         runs-on: ubuntu-latest
 
         steps:
