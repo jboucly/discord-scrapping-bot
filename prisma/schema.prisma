@@ -47,14 +47,14 @@ model Daily {
 }
 
 model LbcTracker {
-    id               Int                  @id @default(autoincrement())
-    createdAt        DateTime             @default(now()) @db.Timestamptz(6)
-    updatedAt        DateTime             @updatedAt @db.Timestamptz(6)
-    url              String               @unique @db.VarChar(255)
-    name             String               @db.VarChar(255)
-    channelId        String               @db.VarChar(255)
-    userId           String               @db.VarChar(255)
-    TreatyRealEstate TreatyAdLbcTracker[]
+    id                 Int                  @id @default(autoincrement())
+    createdAt          DateTime             @default(now()) @db.Timestamptz(6)
+    updatedAt          DateTime             @updatedAt @db.Timestamptz(6)
+    url                String               @unique @db.VarChar(255)
+    name               String               @db.VarChar(255)
+    channelId          String               @db.VarChar(255)
+    userId             String               @db.VarChar(255)
+    TreatyAdLbcTracker TreatyAdLbcTracker[]
 }
 
 model TreatyAdLbcTracker {
@@ -63,12 +63,11 @@ model TreatyAdLbcTracker {
     updatedAt    DateTime @updatedAt @db.Timestamptz(6)
     url          String?  @db.VarChar(255)
     title        String?  @db.VarChar(255)
-    description  String?  @db.Text
     price        String?  @db.VarChar(50)
     pricePerM2   String?  @db.VarChar(50)
     imageUrl     String?  @db.VarChar(255)
     location     String?  @db.VarChar(255)
-    lbcTrackerId String   @db.VarChar(255)
+    lbcTrackerId Int
 
-    realEstate LbcTracker @relation(fields: [lbcTrackerId], references: [url], onDelete: Cascade)
+    LbcTracker LbcTracker @relation(fields: [lbcTrackerId], references: [id], onDelete: Cascade)
 }

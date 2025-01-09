@@ -18,12 +18,11 @@ CREATE TABLE "TreatyAdLbcTracker" (
     "updatedAt" TIMESTAMPTZ(6) NOT NULL,
     "url" VARCHAR(255),
     "title" VARCHAR(255),
-    "description" TEXT,
     "price" VARCHAR(50),
     "pricePerM2" VARCHAR(50),
     "imageUrl" VARCHAR(255),
     "location" VARCHAR(255),
-    "lbcTrackerId" VARCHAR(255) NOT NULL,
+    "lbcTrackerId" INTEGER NOT NULL,
 
     CONSTRAINT "TreatyAdLbcTracker_pkey" PRIMARY KEY ("id")
 );
@@ -32,4 +31,4 @@ CREATE TABLE "TreatyAdLbcTracker" (
 CREATE UNIQUE INDEX "LbcTracker_url_key" ON "LbcTracker"("url");
 
 -- AddForeignKey
-ALTER TABLE "TreatyAdLbcTracker" ADD CONSTRAINT "TreatyAdLbcTracker_lbcTrackerId_fkey" FOREIGN KEY ("lbcTrackerId") REFERENCES "LbcTracker"("url") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TreatyAdLbcTracker" ADD CONSTRAINT "TreatyAdLbcTracker_lbcTrackerId_fkey" FOREIGN KEY ("lbcTrackerId") REFERENCES "LbcTracker"("id") ON DELETE CASCADE ON UPDATE CASCADE;
