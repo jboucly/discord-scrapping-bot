@@ -5,7 +5,7 @@ import { LBCTrackerService } from './services/lbc-tracker.service';
 
 export default {
 	data: new SlashCommandBuilder()
-		.setName('search-estate')
+		.setName('lbc-tracker')
 		.setDescription('Configure your search estate search notification 🔥')
 		.addSubcommand((subcommand) =>
 			subcommand
