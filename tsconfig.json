@@ -3,7 +3,7 @@
 		"require": ["tsconfig-paths/register"]
 	},
 	"compilerOptions": {
-		"lib": ["ES2024"],
+		"lib": ["ES2024", "DOM"],
 		"target": "ES2024",
 		"module": "CommonJS",
 		"outDir": "./dist",
