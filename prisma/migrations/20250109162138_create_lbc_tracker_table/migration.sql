@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "RealEstate" (
+CREATE TABLE "LbcTracker" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(6) NOT NULL,
@@ -8,11 +8,11 @@ CREATE TABLE "RealEstate" (
     "channelId" VARCHAR(255) NOT NULL,
     "userId" VARCHAR(255) NOT NULL,
 
-    CONSTRAINT "RealEstate_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "LbcTracker_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "TreatyRealEstate" (
+CREATE TABLE "TreatyAdLbcTracker" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(6) NOT NULL,
@@ -23,13 +23,13 @@ CREATE TABLE "TreatyRealEstate" (
     "pricePerM2" VARCHAR(50),
     "imageUrl" VARCHAR(255),
     "location" VARCHAR(255),
-    "realEstateId" VARCHAR(255) NOT NULL,
+    "lbcTrackerId" VARCHAR(255) NOT NULL,
 
-    CONSTRAINT "TreatyRealEstate_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "TreatyAdLbcTracker_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "RealEstate_url_key" ON "RealEstate"("url");
+CREATE UNIQUE INDEX "LbcTracker_url_key" ON "LbcTracker"("url");
 
 -- AddForeignKey
-ALTER TABLE "TreatyRealEstate" ADD CONSTRAINT "TreatyRealEstate_realEstateId_fkey" FOREIGN KEY ("realEstateId") REFERENCES "RealEstate"("url") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TreatyAdLbcTracker" ADD CONSTRAINT "TreatyAdLbcTracker_lbcTrackerId_fkey" FOREIGN KEY ("lbcTrackerId") REFERENCES "LbcTracker"("url") ON DELETE CASCADE ON UPDATE CASCADE;
