@@ -22,11 +22,16 @@ export class BotGlobalEvent {
 		this.client.on('messageCreate', (message) => {
 			if (message.author.bot) return;
 
-			const commandBody = message.content.includes('ping');
+			const pingBody = message.content.includes('ping');
+			const whatBody = message.content.includes('quoi');
 
-			if (commandBody) {
+			if (pingBody) {
 				const timeTaken = Date.now() - message.createdTimestamp;
 				message.reply(`Pong! This message had a latency of ${timeTaken}ms.`);
+			}
+
+			if (whatBody) {
+				message.reply('Feur');
 			}
 		});
 	}
