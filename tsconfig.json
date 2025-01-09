@@ -16,6 +16,7 @@
 		"noUnusedParameters": true,
 		"noUncheckedIndexedAccess": true,
 		"skipLibCheck": true,
+		"sourceMap": true,
 		"resolveJsonModule": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
