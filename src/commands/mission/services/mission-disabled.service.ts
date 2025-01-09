@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { prismaClient } from '@common/clients/prisma.client';
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
@@ -14,12 +14,11 @@ import { ICommand } from '../../../common/interfaces/command.interface';
 export class MissionDisabledCommandService implements ICommand {
 	constructor(
 		private readonly client: Client,
-		private readonly prismaService: PrismaClient,
 		private readonly interaction: ChatInputCommandInteraction
 	) {}
 
 	public async execute(): Promise<void> {
-		const allMissionSaved = await this.prismaService.missions.findMany({
+		const allMissionSaved = await prismaClient.missions.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 
@@ -70,7 +69,7 @@ export class MissionDisabledCommandService implements ICommand {
 			const missionIdToRemove = Number(confirmation.values[0]);
 
 			if (isNumber(Number(missionIdToRemove)) && !isNaN(missionIdToRemove)) {
-				await this.prismaService.missions.deleteMany({
+				await prismaClient.missions.deleteMany({
 					where: {
 						id: missionIdToRemove
 					}

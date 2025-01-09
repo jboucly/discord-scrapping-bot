@@ -1,5 +1,5 @@
+import { prismaClient } from '@common/clients/prisma.client';
 import { ICommand } from '@common/interfaces/command.interface';
-import { prismaClient } from '@common/services/prisma.service';
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
@@ -12,29 +12,27 @@ import {
 import { isNumber } from 'lodash';
 
 export class LBCTrackerSearchDisabledService implements ICommand {
-	private readonly prismaService = prismaClient;
-
 	constructor(
 		private readonly client: Client,
 		private readonly interaction: ChatInputCommandInteraction
 	) {}
 
 	public async execute(): Promise<void> {
-		const allSearchSaved = await this.prismaService.lbcTracker.findMany({
+		const allSearchSaved = await prismaClient.lbcTracker.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 
 		if (allSearchSaved.length === 0) {
 			await this.interaction.reply({
 				flags: 'Ephemeral',
-				content: '❌ You have no search real estate notification configured'
+				content: '❌ You have no search lbc tracker notification configured'
 			});
 			return;
 		}
 
 		const selectInput = new StringSelectMenuBuilder()
-			.setCustomId('removeRealEstateSelect')
-			.setPlaceholder('Select a real estate to remove')
+			.setCustomId('removelbcTrackerSelect')
+			.setPlaceholder('Select a lbc tracker to remove')
 			.addOptions(
 				allSearchSaved.map((realEstate) =>
 					new StringSelectMenuOptionBuilder()
@@ -51,7 +49,7 @@ export class LBCTrackerSearchDisabledService implements ICommand {
 		const response = await this.interaction.reply({
 			flags: 'Ephemeral',
 			components: [actionRow as any],
-			content: 'Choose real estate to remove :'
+			content: 'Choose lbc tracker to remove :'
 		});
 
 		this.setUserResponseEventCallback(response);
@@ -67,14 +65,14 @@ export class LBCTrackerSearchDisabledService implements ICommand {
 			const realEstateIdToRemove = Number(confirmation.values[0]);
 
 			if (isNumber(realEstateIdToRemove) && !isNaN(realEstateIdToRemove)) {
-				await this.prismaService.lbcTracker.deleteMany({
+				await prismaClient.lbcTracker.deleteMany({
 					where: {
 						id: realEstateIdToRemove
 					}
 				});
 
 				await confirmation.update({
-					content: '🚀 Notification real estate removed',
+					content: '🚀 Notification lbc tracker removed',
 					components: []
 				});
 			}

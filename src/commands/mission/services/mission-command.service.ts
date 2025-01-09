@@ -1,7 +1,6 @@
 import { ChatInputCommandInteraction, Client } from 'discord.js';
 import { isNil } from 'lodash';
 import { ICommand } from '../../../common/interfaces/command.interface';
-import { prismaClient } from '../../../common/services/prisma.service';
 import { CommandOptionsUtils } from '../../../common/utils/command-options.utils';
 import { MissionOptions } from '../enums/mission-option.enum';
 import { MissionDisabledCommandService } from './mission-disabled.service';
@@ -13,25 +12,20 @@ export class MissionCommandService implements ICommand {
 	constructor(
 		private readonly client: Client,
 		private readonly interaction: ChatInputCommandInteraction,
-		private readonly prismaService = prismaClient,
 		private readonly enabledMissionCommandService: EnabledMissionCommandService = new EnabledMissionCommandService(
 			client,
-			prismaService,
 			interaction
 		),
 		private readonly missionListCommandService: MissionListCommandService = new MissionListCommandService(
 			client,
-			prismaService,
 			interaction
 		),
 		private readonly missionDisabledCommandService: MissionDisabledCommandService = new MissionDisabledCommandService(
 			client,
-			prismaService,
 			interaction
 		),
 		private readonly updateMissionCommandService: UpdateMissionCommandService = new UpdateMissionCommandService(
 			client,
-			prismaService,
 			interaction
 		)
 	) {}

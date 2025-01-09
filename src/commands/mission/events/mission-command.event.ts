@@ -1,19 +1,17 @@
 import fetch from 'node-fetch';
 
+import { prismaClient } from '@common/clients/prisma.client';
 import { IEvent } from '@common/interfaces/event.interface';
 import { Missions } from '@prisma/client';
 import { CronJob } from 'cron';
 import { format } from 'date-fns';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
-import { prismaClient } from '../../../common/services/prisma.service';
 import { FreeWorkJob, FreeWorkJobs } from '../interfaces/free-work-jobs.interface';
 import { MissionNotification, MissionToTrack } from '../interfaces/mission-notification.interface';
 import { PyloteJobs } from '../interfaces/pylote-jobs.interface';
 
 export class MissionCommandEvent implements IEvent {
-	private readonly prismaService = prismaClient;
-
 	public async startCronJobs(client: Client): Promise<void> {
 		const crontab = process.env.MISSION_CRON;
 		if (isNil(crontab)) throw new Error('Crontab for mission not found');
@@ -23,13 +21,13 @@ export class MissionCommandEvent implements IEvent {
 		});
 
 		cron.start();
-		console.info('\nℹ️  Mission cron jobs started with crontab :', crontab);
+		console.info('\nℹ️  Mission cron jobs started with crontab :', crontab, '\n');
 	}
 
 	public async sendMissionNotification(client: Client): Promise<void> {
 		let allMissions: MissionToTrack[] = [...(await this.getFreeWorkMission())];
 
-		const allMissionSearch = await this.prismaService.missions.findMany({ include: { treaty: true } });
+		const allMissionSearch = await prismaClient.missions.findMany({ include: { treaty: true } });
 		if (allMissionSearch.length === 0) return;
 
 		for (const missionSearch of allMissionSearch) {
@@ -115,7 +113,7 @@ export class MissionCommandEvent implements IEvent {
 
 	private async getFreeWorkMission(): Promise<MissionToTrack[]> {
 		const valToReturn: MissionToTrack[] = [];
-		const allMissionSearch = await this.prismaService.missions.findMany();
+		const allMissionSearch = await prismaClient.missions.findMany();
 
 		if (!isNil(process.env.FREE_WORK_URL) && !isNil(allMissionSearch)) {
 			for (const missionSearch of allMissionSearch) {
@@ -158,7 +156,7 @@ export class MissionCommandEvent implements IEvent {
 	 */
 	private async getPyloteMission(): Promise<MissionToTrack[]> {
 		const valToReturn: MissionToTrack[] = [];
-		const allMissionSearch = await this.prismaService.missions.findMany();
+		const allMissionSearch = await prismaClient.missions.findMany();
 
 		if (!isNil(process.env.PYLOTE_URL) && !isNil(allMissionSearch)) {
 			const response = await fetch(process.env.PYLOTE_URL);
@@ -208,7 +206,7 @@ export class MissionCommandEvent implements IEvent {
 	 */
 	private async saveTreastyMission(missionToSend: MissionNotification[], missionSearch: Missions): Promise<void> {
 		if (missionToSend.length > 0) {
-			await this.prismaService.treatyMission.createMany({
+			await prismaClient.treatyMission.createMany({
 				data: missionToSend.map((m) => ({
 					createdAt: new Date(),
 					updatedAt: new Date(),

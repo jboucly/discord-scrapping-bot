@@ -1,17 +1,17 @@
-import { Missions, PrismaClient } from '@prisma/client';
+import { prismaClient } from '@common/clients/prisma.client';
+import { ICommand } from '@common/interfaces/command.interface';
+import { Missions } from '@prisma/client';
 import { ChatInputCommandInteraction, Client, EmbedBuilder } from 'discord.js';
 import { isNil } from 'lodash';
-import { ICommand } from '../../../common/interfaces/command.interface';
 
 export class MissionListCommandService implements ICommand {
 	constructor(
 		private readonly client: Client,
-		private readonly prismaService: PrismaClient,
 		private readonly interaction: ChatInputCommandInteraction
 	) {}
 
 	public async execute(): Promise<void> {
-		const alreadyExist = await this.prismaService.missions.findMany({
+		const alreadyExist = await prismaClient.missions.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 

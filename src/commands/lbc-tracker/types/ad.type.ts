@@ -1,4 +1,4 @@
-export type RealEstateAd = {
+export type Ad = {
 	url: string | null;
 	title?: string;
 	img?: string;

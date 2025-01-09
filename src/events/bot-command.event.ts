@@ -39,7 +39,7 @@ export class BotCommandEvent {
 				case 'mission':
 					this.missionCommandService.startCronJobs(this.client);
 					break;
-				case 'search-estate':
+				case 'lbc-tracker':
 					this.lbcTrackerCommandEvent.startCronJobs(this.client);
 					break;
 			}

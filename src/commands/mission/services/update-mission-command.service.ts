@@ -1,4 +1,5 @@
-import { Missions, PrismaClient } from '@prisma/client';
+import { prismaClient } from '@common/clients/prisma.client';
+import { Missions } from '@prisma/client';
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
@@ -20,12 +21,11 @@ export class UpdateMissionCommandService implements ICommand {
 
 	constructor(
 		private readonly client: Client,
-		private readonly prismaService: PrismaClient,
 		private readonly interaction: ChatInputCommandInteraction
 	) {}
 
 	public async execute(): Promise<void> {
-		const allMissionSaved = await this.prismaService.missions.findMany({
+		const allMissionSaved = await prismaClient.missions.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 
@@ -74,7 +74,7 @@ export class UpdateMissionCommandService implements ICommand {
 
 		try {
 			const missionIdToUpdate = Number(selectMenuInteraction.values[0]);
-			const missionToUpdate = await this.prismaService.missions.findUnique({
+			const missionToUpdate = await prismaClient.missions.findUnique({
 				where: {
 					id: missionIdToUpdate
 				}
@@ -136,7 +136,7 @@ export class UpdateMissionCommandService implements ICommand {
 		const words = modalInteraction.fields.getTextInputValue('wordsInput');
 		const forbiddenWords = modalInteraction.fields.getTextInputValue('ForbiddenWordsInput');
 
-		await this.prismaService.missions.update({
+		await prismaClient.missions.update({
 			where: {
 				id: this.missionToUpdate.id
 			},

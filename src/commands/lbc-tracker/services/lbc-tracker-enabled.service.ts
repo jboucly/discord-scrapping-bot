@@ -1,13 +1,11 @@
+import { prismaClient } from '@common/clients/prisma.client';
 import { ICommand } from '@common/interfaces/command.interface';
-import { prismaClient } from '@common/services/prisma.service';
 import { isValidHttpUrl } from '@common/utils/string.utils';
 import { CacheType, ChatInputCommandInteraction, CommandInteractionOption } from 'discord.js';
 import { isNil } from 'lodash';
 import { LBCTrackerOption } from '../enums/lbc-tracker-option.enum';
 
 export class LBCTrackerEnabledService implements ICommand {
-	private readonly prismaService = prismaClient;
-
 	constructor(private readonly interaction: ChatInputCommandInteraction) {}
 
 	public async execute(optChannel: readonly CommandInteractionOption<CacheType>[]): Promise<void> {
@@ -15,7 +13,7 @@ export class LBCTrackerEnabledService implements ICommand {
 		const name = optChannel.find((e) => e.name === LBCTrackerOption.NAME)?.value as string;
 		const urlToSearch = optChannel.find((e) => e.name === LBCTrackerOption.URL)?.value as string;
 
-		const alreadyExist = await this.prismaService.lbcTracker.findFirst({
+		const alreadyExist = await prismaClient.lbcTracker.findFirst({
 			where: {
 				channelId,
 				userId: this.interaction.user.id
@@ -32,7 +30,7 @@ export class LBCTrackerEnabledService implements ICommand {
 		}
 
 		if (!isNil(alreadyExist)) {
-			await this.prismaService.lbcTracker.update({
+			await prismaClient.lbcTracker.update({
 				where: {
 					id: alreadyExist.id
 				},
@@ -43,7 +41,7 @@ export class LBCTrackerEnabledService implements ICommand {
 				}
 			});
 		} else {
-			await this.prismaService.lbcTracker.create({
+			await prismaClient.lbcTracker.create({
 				data: {
 					channelId,
 					name: name,
@@ -54,7 +52,7 @@ export class LBCTrackerEnabledService implements ICommand {
 		}
 
 		await this.interaction.reply({
-			content: `🚀 Notification for search real estate enabled with name : ${name}`,
+			content: `🚀 Notification for search lbc tracker enabled with name : ${name}`,
 			flags: 'Ephemeral',
 			withResponse: true
 		});

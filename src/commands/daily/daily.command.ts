@@ -1,3 +1,4 @@
+import { prismaClient } from '@common/clients/prisma.client';
 import { Daily } from '@prisma/client';
 import { CronJob } from 'cron';
 import {
@@ -14,12 +15,10 @@ import {
 	TextChannel
 } from 'discord.js';
 import { isNaN, isNil, isNumber } from 'lodash';
-import { prismaClient } from '../../common/services/prisma.service';
 import { CommandOptionsUtils } from '../../common/utils/command-options.utils';
 import { SetDevBotReact } from '../../common/utils/react.utils';
 import { DailyOptionsHoursChoices, DailyOptionsMinutesChoices } from './constants/daily-option-choice.constant';
 import { DailyOptions } from './enums/daily-option.enum';
-
 const TransformCrontab = require('cronstrue');
 
 function createEmbeds(daily: Daily[]): EmbedBuilder[] {
@@ -84,7 +83,6 @@ const DailyCommand = {
 
 	async execute(interaction: ChatInputCommandInteraction, client: Client) {
 		let isUpdated = false;
-		const prisma = prismaClient;
 
 		const isEnabled = CommandOptionsUtils.getNotRequired(interaction, DailyOptions.ENABLED);
 		const isMissionList = !isNil(CommandOptionsUtils.getNotRequired(interaction, DailyOptions.LIST));
@@ -116,7 +114,7 @@ const DailyCommand = {
 				chanelName: (client.channels.cache.find((channel: any) => channel.id === optChannel.value) as any)?.name
 			};
 
-			const res = await prisma.daily.findFirst({
+			const res = await prismaClient.daily.findFirst({
 				where: {
 					crontab: dailyToSave.time,
 					channelId: dailyToSave.channelId
@@ -125,7 +123,7 @@ const DailyCommand = {
 
 			if (!isNil(res)) {
 				isUpdated = true;
-				await prisma.daily.update({
+				await prismaClient.daily.update({
 					where: {
 						id: res.id
 					},
@@ -134,7 +132,7 @@ const DailyCommand = {
 					}
 				});
 			} else {
-				await prisma.daily.create({
+				await prismaClient.daily.create({
 					data: {
 						createdAt: new Date(),
 						updatedAt: new Date(),
@@ -167,7 +165,7 @@ const DailyCommand = {
 			});
 			await SetDevBotReact(client, message);
 		} else if (isMissionList) {
-			const alreadyExist = await prisma.daily.findMany();
+			const alreadyExist = await prismaClient.daily.findMany();
 
 			if (isNil(alreadyExist) || alreadyExist.length === 0) {
 				await interaction.reply({ content: 'You have no daily configured', ephemeral: true });
@@ -177,7 +175,7 @@ const DailyCommand = {
 			const message = await interaction.reply({ embeds: createEmbeds(alreadyExist), withResponse: true });
 			await SetDevBotReact(client, message as any);
 		} else if (isDisabled) {
-			const allDaily = await prisma.daily.findMany();
+			const allDaily = await prismaClient.daily.findMany();
 
 			if (allDaily.length === 0) {
 				await interaction.reply({ content: 'You have no daily configured', ephemeral: true });
@@ -212,7 +210,7 @@ const DailyCommand = {
 				const dailyIdToRemove = Number(confirmation.values[0]);
 
 				if (isNumber(Number(dailyIdToRemove)) && !isNaN(dailyIdToRemove)) {
-					await prisma.daily.deleteMany({
+					await prismaClient.daily.deleteMany({
 						where: {
 							id: dailyIdToRemove
 						}

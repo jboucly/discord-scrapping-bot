@@ -1,5 +1,5 @@
+import { prismaClient } from '@common/clients/prisma.client';
 import { ICommand } from '@common/interfaces/command.interface';
-import { prismaClient } from '@common/services/prisma.service';
 import { LbcTracker } from '@prisma/client';
 import {
 	ActionRowBuilder,
@@ -18,7 +18,6 @@ export class LBCTrackerUpdateService implements ICommand {
 	private modalId: string;
 	private realEstateToUpdate: LbcTracker;
 
-	private readonly prismaService = prismaClient;
 	private readonly modalInputId = {
 		name: 'nameInput',
 		url: 'urlInput'
@@ -30,32 +29,32 @@ export class LBCTrackerUpdateService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const allRealEstateSaved = await this.prismaService.lbcTracker.findMany({
+		const allLbctrackerSaved = await prismaClient.lbcTracker.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 
-		if (allRealEstateSaved.length === 0) {
+		if (allLbctrackerSaved.length === 0) {
 			await this.interaction.reply({
-				content: '❌ You have no real estate notification configured',
+				content: '❌ You have no lbc tracker notification configured',
 				ephemeral: true
 			});
 			return;
 		}
 
 		console.log(
-			allRealEstateSaved.map((realEstate) => {
+			allLbctrackerSaved.map((lbcTracker) => {
 				return new StringSelectMenuOptionBuilder()
-					.setDescription(`Name : ${realEstate.name}`)
+					.setDescription(`Name : ${lbcTracker.name}`)
 					.setEmoji('🏠')
-					.setValue(`${realEstate.id}`);
+					.setValue(`${lbcTracker.id}`);
 			})
 		);
 
 		const selectInput = new StringSelectMenuBuilder()
 			.setCustomId('updateRealEstateSelect')
-			.setPlaceholder('Select a real estate to update')
+			.setPlaceholder('Select a lbc tracker to update')
 			.addOptions(
-				allRealEstateSaved.map((realEstate) =>
+				allLbctrackerSaved.map((realEstate) =>
 					new StringSelectMenuOptionBuilder()
 						.setLabel(`Name : ${realEstate.name}`)
 						.setDescription(
@@ -71,7 +70,7 @@ export class LBCTrackerUpdateService implements ICommand {
 		const response = await this.interaction.reply({
 			flags: 'Ephemeral',
 			components: [actionRow as any],
-			content: 'Choose real estate to update :'
+			content: 'Choose lbc tracker to update :'
 		});
 
 		await this.setSelectEvent(response);
@@ -85,7 +84,7 @@ export class LBCTrackerUpdateService implements ICommand {
 
 		try {
 			const realEstateIdToUpdate = Number(selectMenuInteraction.values[0]);
-			const realEstataToUpdate = await this.prismaService.lbcTracker.findUnique({
+			const realEstataToUpdate = await prismaClient.lbcTracker.findUnique({
 				where: {
 					id: realEstateIdToUpdate
 				}
@@ -109,7 +108,7 @@ export class LBCTrackerUpdateService implements ICommand {
 	private constructModal(): ModalBuilder {
 		this.modalId = `updateMissionModal-${this.interaction.user.id}`;
 
-		const modal = new ModalBuilder().setCustomId(this.modalId).setTitle('Update real estate notification');
+		const modal = new ModalBuilder().setCustomId(this.modalId).setTitle('Update lbc tracker notification');
 
 		const realEstateNameInput = new TextInputBuilder()
 			.setCustomId(this.modalInputId.name)
@@ -145,7 +144,7 @@ export class LBCTrackerUpdateService implements ICommand {
 		const name = modalInteraction.fields.getTextInputValue(this.modalInputId.name);
 		const url = modalInteraction.fields.getTextInputValue(this.modalInputId.url);
 
-		await this.prismaService.lbcTracker.update({
+		await prismaClient.lbcTracker.update({
 			where: {
 				id: this.realEstateToUpdate.id
 			},
@@ -155,7 +154,7 @@ export class LBCTrackerUpdateService implements ICommand {
 		await modalInteraction.reply({
 			flags: 'Ephemeral',
 			withResponse: true,
-			content: '🚀 Notification real estate updated'
+			content: '🚀 Notification lbc tracker updated'
 		});
 	}
 }
