@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
@@ -9,12 +10,11 @@ import {
 } from 'discord.js';
 import { isNumber } from 'lodash';
 import { ICommand } from '../../../common/interfaces/command.interface';
-import { PrismaService } from '../../../common/services/prisma.service';
 
 export class MissionDisabledCommandService implements ICommand {
 	constructor(
 		private readonly client: Client,
-		private readonly prismaService: PrismaService,
+		private readonly prismaService: PrismaClient,
 		private readonly interaction: ChatInputCommandInteraction
 	) {}
 

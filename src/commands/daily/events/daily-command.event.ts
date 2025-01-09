@@ -2,10 +2,10 @@ import { Daily } from '@prisma/client';
 import { CronJob } from 'cron';
 import { Client, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
-import { PrismaService } from '../../../common/services/prisma.service';
+import { prismaClient } from '../../../common/services/prisma.service';
 
 export class DailyCommandEvent {
-	constructor(private readonly prismaService: PrismaService = new PrismaService()) {}
+	private readonly prismaService = prismaClient;
 
 	public async startCronJobs(client: Client): Promise<void> {
 		const cronData = await this.prismaService.daily.findMany();

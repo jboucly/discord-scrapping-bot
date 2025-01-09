@@ -1,13 +1,13 @@
+import { PrismaClient } from '@prisma/client';
 import { CacheType, ChatInputCommandInteraction, Client, CommandInteractionOption } from 'discord.js';
 import { isArray, isNil } from 'lodash';
-import { PrismaService } from '../../../common/services/prisma.service';
 import { MissionOptions } from '../enums/mission-option.enum';
 import { WordUtils } from '../utils/word.utils';
 
 export class EnabledMissionCommandService /*implements ICommand*/ {
 	constructor(
 		private readonly client: Client,
-		private readonly prismaService: PrismaService,
+		private readonly prismaService: PrismaClient,
 		private readonly interaction: ChatInputCommandInteraction
 	) {}
 

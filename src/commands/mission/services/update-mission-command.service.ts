@@ -1,4 +1,4 @@
-import { Missions } from '@prisma/client';
+import { Missions, PrismaClient } from '@prisma/client';
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
@@ -12,7 +12,6 @@ import {
 	TextInputStyle
 } from 'discord.js';
 import { ICommand } from '../../../common/interfaces/command.interface';
-import { PrismaService } from '../../../common/services/prisma.service';
 import { WordUtils } from '../utils/word.utils';
 
 export class UpdateMissionCommandService implements ICommand {
@@ -21,7 +20,7 @@ export class UpdateMissionCommandService implements ICommand {
 
 	constructor(
 		private readonly client: Client,
-		private readonly prismaService: PrismaService,
+		private readonly prismaService: PrismaClient,
 		private readonly interaction: ChatInputCommandInteraction
 	) {}
 

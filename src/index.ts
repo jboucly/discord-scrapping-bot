@@ -1,4 +1,6 @@
 import 'dotenv/config';
+import 'module-alias/register';
+
 import express from 'express';
 import { DiscordClient } from './discord-bot';
 

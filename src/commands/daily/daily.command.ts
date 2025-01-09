@@ -14,7 +14,7 @@ import {
 	TextChannel
 } from 'discord.js';
 import { isNaN, isNil, isNumber } from 'lodash';
-import { PrismaService } from '../../common/services/prisma.service';
+import { prismaClient } from '../../common/services/prisma.service';
 import { CommandOptionsUtils } from '../../common/utils/command-options.utils';
 import { SetDevBotReact } from '../../common/utils/react.utils';
 import { DailyOptionsHoursChoices, DailyOptionsMinutesChoices } from './constants/daily-option-choice.constant';
@@ -84,7 +84,7 @@ const DailyCommand = {
 
 	async execute(interaction: ChatInputCommandInteraction, client: Client) {
 		let isUpdated = false;
-		const prisma = new PrismaService();
+		const prisma = prismaClient;
 
 		const isEnabled = CommandOptionsUtils.getNotRequired(interaction, DailyOptions.ENABLED);
 		const isMissionList = !isNil(CommandOptionsUtils.getNotRequired(interaction, DailyOptions.LIST));

@@ -1,5 +1,7 @@
-import { REST, Routes } from 'discord.js';
 import 'dotenv/config';
+import 'module-alias/register';
+
+import { REST, Routes } from 'discord.js';
 import { Commands } from './commands';
 
 const { TOKEN, CLIENT_ID, GUILD_ID } = process.env;

@@ -5,13 +5,13 @@ import { CronJob } from 'cron';
 import { format } from 'date-fns';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
-import { PrismaService } from '../../../common/services/prisma.service';
+import { prismaClient } from '../../../common/services/prisma.service';
 import { FreeWorkJob, FreeWorkJobs } from '../interfaces/free-work-jobs.interface';
 import { MissionNotification, MissionToTrack } from '../interfaces/mission-notification.interface';
 import { PyloteJobs } from '../interfaces/pylote-jobs.interface';
 
 export class MissionCommandEvent {
-	constructor(private readonly prismaService: PrismaService = new PrismaService()) {}
+	private readonly prismaService = prismaClient;
 
 	public async startCronJobs(client: Client): Promise<void> {
 		const crontab = process.env.MISSION_CRON;
