@@ -1,12 +1,33 @@
 {
+	"ts-node": {
+		"require": ["tsconfig-paths/register"]
+	},
 	"compilerOptions": {
+		"lib": ["ES2024"],
 		"target": "ES2024",
-		"module": "CommonJS" /* Specify what module code is generated. */,
-		"rootDir": "src" /* Specify the root folder within your source files. */,
-		"outDir": "./out",
+		"module": "CommonJS",
+		"outDir": "./dist",
+		"declaration": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
 		"strict": true,
-		"skipLibCheck": true /* Skip type checking all .d.ts files. */,
-		"esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
-		"forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */
-	}
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"noUnusedParameters": true,
+		"noUncheckedIndexedAccess": true,
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"strictPropertyInitialization": false,
+
+		"baseUrl": ".",
+		"paths": {
+			"@common/*": ["./src/common/*"],
+			"@events/*": ["./src/events/*"],
+			"@commands/*": ["./src/commands/*"]
+		}
+	},
+	"include": ["src/**/*"],
+	"exclude": ["scripts"]
 }
