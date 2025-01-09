@@ -31,6 +31,9 @@ export default {
 		.addSubcommand((subcommand) =>
 			subcommand.setName(RealEstateSearchType.DISABLED).setDescription('Disable search estate notification')
 		)
+		.addSubcommand((subcommand) =>
+			subcommand.setName(RealEstateSearchType.LIST).setDescription('List all search estate notifications')
+		)
 		.toJSON(),
 
 	async execute(interaction: ChatInputCommandInteraction, client: Client) {
