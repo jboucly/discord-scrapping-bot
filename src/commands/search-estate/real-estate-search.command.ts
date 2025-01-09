@@ -34,6 +34,9 @@ export default {
 		.addSubcommand((subcommand) =>
 			subcommand.setName(RealEstateSearchType.LIST).setDescription('List all search estate notifications')
 		)
+		.addSubcommand((subcommand) =>
+			subcommand.setName(RealEstateSearchType.UPDATE).setDescription('Update your search estate')
+		)
 		.toJSON(),
 
 	async execute(interaction: ChatInputCommandInteraction, client: Client) {
