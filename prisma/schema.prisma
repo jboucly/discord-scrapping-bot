@@ -45,3 +45,30 @@ model Daily {
     channelName String   @db.VarChar(255)
     message     String   @db.VarChar(255)
 }
+
+model RealEstate {
+    id               Int                @id @default(autoincrement())
+    createdAt        DateTime           @default(now()) @db.Timestamptz(6)
+    updatedAt        DateTime           @updatedAt @db.Timestamptz(6)
+    url              String             @unique @db.VarChar(255)
+    name             String             @db.VarChar(255)
+    channelId        String             @db.VarChar(255)
+    userId           String             @db.VarChar(255)
+    TreatyRealEstate TreatyRealEstate[]
+}
+
+model TreatyRealEstate {
+    id           Int      @id @default(autoincrement())
+    createdAt    DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+    url          String?  @db.VarChar(255)
+    title        String?  @db.VarChar(255)
+    description  String?  @db.Text
+    price        String?  @db.VarChar(50)
+    pricePerM2   String?  @db.VarChar(50)
+    imageUrl     String?  @db.VarChar(255)
+    location     String?  @db.VarChar(255)
+    realEstateId String   @db.VarChar(255)
+
+    realEstate RealEstate @relation(fields: [realEstateId], references: [url], onDelete: Cascade)
+}
