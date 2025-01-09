@@ -58,6 +58,26 @@ Example :
 /daily update
 ```
 
+3. LBC tracker command :
+
+If you want to have notifications of the latest LBC announcements you can set it up !!
+
+Example :
+
+```bash
+# List all lbc trackers notifications configured
+/lbc-tracker list
+
+# Configure lbc trackers ads notification
+/lbc-tracker enabled
+
+# Remove lbc trackers notification
+/lbc-tracker disabled
+
+# Update lbc trackers notification
+/lbc-tracker update
+```
+
 ## Installation
 
 ```bash
