@@ -1,5 +1,6 @@
 import { ICommand } from '@common/interfaces/command.interface';
 import { prismaClient } from '@common/services/prisma.service';
+import { isValidHttpUrl } from '@common/utils/string.utils';
 import { CacheType, ChatInputCommandInteraction, CommandInteractionOption } from 'discord.js';
 import { isNil } from 'lodash';
 import { RealEstateSearchOption } from '../enums/real-estate-search-option.enum';
@@ -20,6 +21,15 @@ export class RealEstateSearchEnabledService implements ICommand {
 				userId: this.interaction.user.id
 			}
 		});
+
+		if (!isValidHttpUrl(urlToSearch)) {
+			await this.interaction.reply({
+				content: `❌ Invalid URL to search : ${urlToSearch}`,
+				flags: 'Ephemeral',
+				withResponse: true
+			});
+			return;
+		}
 
 		if (!isNil(alreadyExist)) {
 			await this.prismaService.realEstate.update({
