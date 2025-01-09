@@ -1,10 +1,11 @@
+import { IEvent } from '@common/interfaces/event.interface';
 import { Daily } from '@prisma/client';
 import { CronJob } from 'cron';
 import { Client, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
 import { prismaClient } from '../../../common/services/prisma.service';
 
-export class DailyCommandEvent {
+export class DailyCommandEvent implements IEvent {
 	private readonly prismaService = prismaClient;
 
 	public async startCronJobs(client: Client): Promise<void> {
@@ -28,7 +29,7 @@ export class DailyCommandEvent {
 				cron.start();
 			});
 
-			console.info('ℹ️  Daily Cron jobs started');
+			console.info('\nℹ️  Daily Cron jobs started');
 		}
 	}
 }

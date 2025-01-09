@@ -1,6 +1,6 @@
 import { ICommand } from '@common/interfaces/command.interface';
 import { prismaClient } from '@common/services/prisma.service';
-import { RealEstate } from '@prisma/client';
+import { LbcTracker } from '@prisma/client';
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
@@ -14,9 +14,9 @@ import {
 	TextInputStyle
 } from 'discord.js';
 
-export class RealEstateSearchUpdateService implements ICommand {
+export class LBCTrackerUpdateService implements ICommand {
 	private modalId: string;
-	private realEstateToUpdate: RealEstate;
+	private realEstateToUpdate: LbcTracker;
 
 	private readonly prismaService = prismaClient;
 	private readonly modalInputId = {
@@ -30,7 +30,7 @@ export class RealEstateSearchUpdateService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const allRealEstateSaved = await this.prismaService.realEstate.findMany({
+		const allRealEstateSaved = await this.prismaService.lbcTracker.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 
@@ -85,7 +85,7 @@ export class RealEstateSearchUpdateService implements ICommand {
 
 		try {
 			const realEstateIdToUpdate = Number(selectMenuInteraction.values[0]);
-			const realEstataToUpdate = await this.prismaService.realEstate.findUnique({
+			const realEstataToUpdate = await this.prismaService.lbcTracker.findUnique({
 				where: {
 					id: realEstateIdToUpdate
 				}
@@ -145,7 +145,7 @@ export class RealEstateSearchUpdateService implements ICommand {
 		const name = modalInteraction.fields.getTextInputValue(this.modalInputId.name);
 		const url = modalInteraction.fields.getTextInputValue(this.modalInputId.url);
 
-		await this.prismaService.realEstate.update({
+		await this.prismaService.lbcTracker.update({
 			where: {
 				id: this.realEstateToUpdate.id
 			},

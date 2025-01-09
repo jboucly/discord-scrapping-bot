@@ -1,4 +1,4 @@
-export enum RealEstateSearchType {
+export enum LBCTrackerType {
 	ENABLED = 'enabled',
 	DISABLED = 'disabled',
 	LIST = 'list',

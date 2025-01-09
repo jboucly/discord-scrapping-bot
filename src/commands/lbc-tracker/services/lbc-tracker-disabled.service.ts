@@ -11,7 +11,7 @@ import {
 } from 'discord.js';
 import { isNumber } from 'lodash';
 
-export class RealEstateSearchDisabledService implements ICommand {
+export class LBCTrackerSearchDisabledService implements ICommand {
 	private readonly prismaService = prismaClient;
 
 	constructor(
@@ -20,7 +20,7 @@ export class RealEstateSearchDisabledService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const allSearchSaved = await this.prismaService.realEstate.findMany({
+		const allSearchSaved = await this.prismaService.lbcTracker.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 
@@ -67,7 +67,7 @@ export class RealEstateSearchDisabledService implements ICommand {
 			const realEstateIdToRemove = Number(confirmation.values[0]);
 
 			if (isNumber(realEstateIdToRemove) && !isNaN(realEstateIdToRemove)) {
-				await this.prismaService.realEstate.deleteMany({
+				await this.prismaService.lbcTracker.deleteMany({
 					where: {
 						id: realEstateIdToRemove
 					}

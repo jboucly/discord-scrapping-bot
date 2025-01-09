@@ -1,9 +1,9 @@
 import { ICommand } from '@common/interfaces/command.interface';
-import { PrismaClient, RealEstate } from '@prisma/client';
+import { LbcTracker, PrismaClient } from '@prisma/client';
 import { ChatInputCommandInteraction, Client, EmbedBuilder } from 'discord.js';
 import { isNil } from 'lodash';
 
-export class RealEstateSearchListService implements ICommand {
+export class LBCTrackerListService implements ICommand {
 	private readonly prismaClient = new PrismaClient();
 
 	constructor(
@@ -12,7 +12,7 @@ export class RealEstateSearchListService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const alreadyExist = await this.prismaClient.realEstate.findMany({
+		const alreadyExist = await this.prismaClient.lbcTracker.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 
@@ -31,7 +31,7 @@ export class RealEstateSearchListService implements ICommand {
 		});
 	}
 
-	private createEmbeds(missions: RealEstate[]): EmbedBuilder[] {
+	private createEmbeds(missions: LbcTracker[]): EmbedBuilder[] {
 		const valToReturn: EmbedBuilder[] = [];
 
 		missions.forEach((realEstate) => {

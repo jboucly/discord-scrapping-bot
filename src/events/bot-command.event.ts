@@ -1,3 +1,4 @@
+import { RealEstateSearchCommandEvent } from '@commands/search-estate/events/real-estate-search-command.event';
 import { Client, Collection, Events, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 import { Commands } from '../commands';
 import { DailyCommandEvent } from '../commands/daily/events/daily-command.event';
@@ -15,7 +16,8 @@ export class BotCommandEvent {
 	constructor(
 		private readonly client: Client,
 		private readonly dailyCommandService: DailyCommandEvent = new DailyCommandEvent(),
-		private readonly missionCommandService: MissionCommandEvent = new MissionCommandEvent()
+		private readonly missionCommandService: MissionCommandEvent = new MissionCommandEvent(),
+		private readonly searchEstateCommandService: RealEstateSearchCommandEvent = new RealEstateSearchCommandEvent()
 	) {}
 
 	public init(): void {
@@ -36,6 +38,9 @@ export class BotCommandEvent {
 					break;
 				case 'mission':
 					this.missionCommandService.startCronJobs(this.client);
+					break;
+				case 'search-estate':
+					this.searchEstateCommandService.startCronJobs(this.client);
 					break;
 			}
 		});

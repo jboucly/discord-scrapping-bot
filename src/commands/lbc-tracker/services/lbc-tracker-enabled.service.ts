@@ -3,19 +3,19 @@ import { prismaClient } from '@common/services/prisma.service';
 import { isValidHttpUrl } from '@common/utils/string.utils';
 import { CacheType, ChatInputCommandInteraction, CommandInteractionOption } from 'discord.js';
 import { isNil } from 'lodash';
-import { RealEstateSearchOption } from '../enums/real-estate-search-option.enum';
+import { LBCTrackerOption } from '../enums/lbc-tracker-option.enum';
 
-export class RealEstateSearchEnabledService implements ICommand {
+export class LBCTrackerEnabledService implements ICommand {
 	private readonly prismaService = prismaClient;
 
 	constructor(private readonly interaction: ChatInputCommandInteraction) {}
 
 	public async execute(optChannel: readonly CommandInteractionOption<CacheType>[]): Promise<void> {
-		const channelId = optChannel.find((e) => e.name === RealEstateSearchOption.CHANNEL)?.value as string;
-		const name = optChannel.find((e) => e.name === RealEstateSearchOption.NAME)?.value as string;
-		const urlToSearch = optChannel.find((e) => e.name === RealEstateSearchOption.URL)?.value as string;
+		const channelId = optChannel.find((e) => e.name === LBCTrackerOption.CHANNEL)?.value as string;
+		const name = optChannel.find((e) => e.name === LBCTrackerOption.NAME)?.value as string;
+		const urlToSearch = optChannel.find((e) => e.name === LBCTrackerOption.URL)?.value as string;
 
-		const alreadyExist = await this.prismaService.realEstate.findFirst({
+		const alreadyExist = await this.prismaService.lbcTracker.findFirst({
 			where: {
 				channelId,
 				userId: this.interaction.user.id
@@ -32,7 +32,7 @@ export class RealEstateSearchEnabledService implements ICommand {
 		}
 
 		if (!isNil(alreadyExist)) {
-			await this.prismaService.realEstate.update({
+			await this.prismaService.lbcTracker.update({
 				where: {
 					id: alreadyExist.id
 				},
@@ -43,7 +43,7 @@ export class RealEstateSearchEnabledService implements ICommand {
 				}
 			});
 		} else {
-			await this.prismaService.realEstate.create({
+			await this.prismaService.lbcTracker.create({
 				data: {
 					channelId,
 					name: name,

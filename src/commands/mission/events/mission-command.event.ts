@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 
+import { IEvent } from '@common/interfaces/event.interface';
 import { Missions } from '@prisma/client';
 import { CronJob } from 'cron';
 import { format } from 'date-fns';
@@ -10,7 +11,7 @@ import { FreeWorkJob, FreeWorkJobs } from '../interfaces/free-work-jobs.interfac
 import { MissionNotification, MissionToTrack } from '../interfaces/mission-notification.interface';
 import { PyloteJobs } from '../interfaces/pylote-jobs.interface';
 
-export class MissionCommandEvent {
+export class MissionCommandEvent implements IEvent {
 	private readonly prismaService = prismaClient;
 
 	public async startCronJobs(client: Client): Promise<void> {
@@ -22,7 +23,7 @@ export class MissionCommandEvent {
 		});
 
 		cron.start();
-		console.info('ℹ️  Mission Cron jobs started with crontab :', crontab);
+		console.info('\nℹ️  Mission cron jobs started with crontab :', crontab);
 	}
 
 	public async sendMissionNotification(client: Client): Promise<void> {
