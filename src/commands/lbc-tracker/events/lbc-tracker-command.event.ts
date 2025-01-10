@@ -75,7 +75,11 @@ export class LBCTrackerCommandEvent implements IEvent {
 
 		try {
 			await page.setViewport({ width: 1080, height: 1024 });
+			await page.setUserAgent(
+				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+			);
 			await page.goto(lbcTracker.url, { waitUntil: 'domcontentloaded' });
+			await page.waitForNetworkIdle();
 			console.log('PAGE 1', page.url());
 
 			// Load all ads
