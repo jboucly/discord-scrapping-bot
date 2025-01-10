@@ -69,7 +69,7 @@ export class LBCTrackerCommandEvent implements IEvent {
 	private async getLBCAds(lbcTracker: LbcTracker): Promise<Ad[]> {
 		const browser = await puppeteer.launch(PuppeteerUtils.getBrowserConfig());
 		const page = await browser.newPage();
-		PuppeteerUtils.setConsoleEvents(page);
+		// PuppeteerUtils.setConsoleEvents(page);
 
 		try {
 			await page.setViewport({ width: 1080, height: 1024 });
