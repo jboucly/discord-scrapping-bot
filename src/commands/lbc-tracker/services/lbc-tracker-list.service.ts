@@ -19,7 +19,7 @@ export class LBCTrackerListService implements ICommand {
 		if (isNil(alreadyExist) || alreadyExist.length === 0) {
 			await this.interaction.reply({
 				flags: 'Ephemeral',
-				content: '❌ You have no real estatet notification configured'
+				content: '❌ You have no lbc tracker notification configured'
 			});
 			return;
 		}
