@@ -23,7 +23,7 @@ const getBrowserConfig = () => {
 	if (process.env.NODE_ENV === 'production') {
 		return {
 			headless: true,
-			executablePath: process.env.CHROME_BIN || '/app/.apt/usr/bin/google-chrome',
+			executablePath: process.env.CHROME_BIN || '/app/.chrome-for-testing/chrome-linux64/chrome',
 			args: [
 				'--no-sandbox',
 				'--disable-setuid-sandbox',
