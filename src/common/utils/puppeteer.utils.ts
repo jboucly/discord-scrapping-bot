@@ -19,6 +19,25 @@ const autoScroll = async (page: Page) => {
 	});
 };
 
+const getBrowserConfig = () => {
+	if (process.env.NODE_ENV === 'production') {
+		return {
+			headless: true,
+			args: [
+				'--no-sandbox',
+				'--disable-setuid-sandbox',
+				'--disable-dev-shm-usage',
+				'--disable-gpu',
+				'--no-zygote',
+				'--single-process'
+			]
+		};
+	}
+
+	return { headless: true };
+};
+
 export const PuppeteerUtils = {
-	autoScroll
+	autoScroll,
+	getBrowserConfig
 };
