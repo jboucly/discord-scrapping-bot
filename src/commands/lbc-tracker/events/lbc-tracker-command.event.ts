@@ -67,24 +67,18 @@ export class LBCTrackerCommandEvent implements IEvent {
 	}
 
 	private async getLBCAds(lbcTracker: LbcTracker): Promise<Ad[]> {
-		console.log('TRACKER', lbcTracker);
-
 		const browser = await puppeteer.launch(PuppeteerUtils.getBrowserConfig());
 		const page = await browser.newPage();
 		PuppeteerUtils.setConsoleEvents(page);
 
 		try {
 			await page.setViewport({ width: 1080, height: 1024 });
-			await page.setUserAgent(
-				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
-			);
 			await page.goto(lbcTracker.url, { waitUntil: 'domcontentloaded' });
-			await page.waitForNetworkIdle();
-			console.log('PAGE 1', page.url());
+			await sleep(Math.random() * 2000 + 1000);
 
 			// Load all ads
 			await PuppeteerUtils.autoScroll(page);
-			await sleep(2382);
+			await sleep(Math.random() * 2000 + 1000);
 
 			const ads: Ad[] = await page.$$eval('a[data-test-id="ad"]', (elements: HTMLAnchorElement[]) =>
 				elements.map((element) => {
@@ -93,8 +87,6 @@ export class LBCTrackerCommandEvent implements IEvent {
 					const price = element.querySelector("p[data-test-id='price']");
 					const pricePerM2 = price?.parentElement?.children[1];
 					const location = element.querySelector("p[aria-label*='Située à']");
-
-					console.log('HHHHEEEERRREE');
 
 					return {
 						url: element.getAttribute('href'),
@@ -109,8 +101,6 @@ export class LBCTrackerCommandEvent implements IEvent {
 					} as Ad;
 				})
 			);
-
-			console.log('ADS =========>', ads);
 
 			await browser.close();
 			return ads;
