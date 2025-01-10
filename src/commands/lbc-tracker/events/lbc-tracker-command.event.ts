@@ -11,7 +11,7 @@ import { Ad } from '../types/ad.type';
 
 export class LBCTrackerCommandEvent implements IEvent {
 	public async startCronJobs(client: Client): Promise<void> {
-		const crontab = process.env.REAL_ESTATE_CRON;
+		const crontab = process.env.LBC_TRACKER_CRON;
 		if (isNil(crontab)) throw new Error('Crontab for lbc tracker not found');
 
 		const cron = new CronJob(crontab, async () => {
