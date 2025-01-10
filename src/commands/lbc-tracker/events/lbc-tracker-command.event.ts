@@ -67,12 +67,16 @@ export class LBCTrackerCommandEvent implements IEvent {
 	}
 
 	private async getLBCAds(lbcTracker: LbcTracker): Promise<Ad[]> {
+		console.log('TRACKER', lbcTracker);
+
 		const browser = await puppeteer.launch(PuppeteerUtils.getBrowserConfig());
 		const page = await browser.newPage();
+		PuppeteerUtils.setConsoleEvents(page);
 
 		try {
 			await page.setViewport({ width: 1080, height: 1024 });
 			await page.goto(lbcTracker.url, { waitUntil: 'domcontentloaded' });
+			console.log('PAGE 1', page.url());
 
 			// Load all ads
 			await PuppeteerUtils.autoScroll(page);
@@ -85,6 +89,8 @@ export class LBCTrackerCommandEvent implements IEvent {
 					const price = element.querySelector("p[data-test-id='price']");
 					const pricePerM2 = price?.parentElement?.children[1];
 					const location = element.querySelector("p[aria-label*='Située à']");
+
+					console.log('HHHHEEEERRREE');
 
 					return {
 						url: element.getAttribute('href'),
@@ -99,6 +105,8 @@ export class LBCTrackerCommandEvent implements IEvent {
 					} as Ad;
 				})
 			);
+
+			console.log('ADS =========>', ads);
 
 			await browser.close();
 			return ads;

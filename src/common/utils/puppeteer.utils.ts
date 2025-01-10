@@ -23,7 +23,7 @@ const getBrowserConfig = () => {
 	if (process.env.NODE_ENV === 'production') {
 		return {
 			headless: true,
-			executablePath: process.env.CHROME_BIN || '/app/.chrome-for-testing/chrome-linux64/chrome',
+			executablePath: process.env.CHROME_BIN ?? '/app/.chrome-for-testing/chrome-linux64/chrome',
 			args: [
 				'--no-sandbox',
 				'--disable-setuid-sandbox',
@@ -38,7 +38,18 @@ const getBrowserConfig = () => {
 	return { headless: true };
 };
 
+const setConsoleEvents = (page: Page) => {
+	page.on('console', async (msg) => {
+		const msgArgs = msg.args();
+
+		for (let i = 0; i < msgArgs.length; ++i) {
+			console.log(await msgArgs[i]?.jsonValue());
+		}
+	});
+};
+
 export const PuppeteerUtils = {
 	autoScroll,
-	getBrowserConfig
+	getBrowserConfig,
+	setConsoleEvents
 };
