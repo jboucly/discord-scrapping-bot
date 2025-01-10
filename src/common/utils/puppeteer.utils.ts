@@ -23,14 +23,14 @@ const getBrowserConfig = () => {
 	if (process.env.NODE_ENV === 'production') {
 		return {
 			headless: true,
-			executablePath: process.env.CHROME_BIN ?? '/app/.chrome-for-testing/chrome-linux64/chrome',
+			// executablePath: process.env.CHROME_BIN ?? '/app/.chrome-for-testing/chrome-linux64/chrome',
 			args: [
-				'--no-sandbox',
-				'--disable-setuid-sandbox',
-				'--disable-dev-shm-usage',
-				'--disable-gpu',
-				'--no-zygote',
-				'--single-process'
+				'--no-sandbox'
+				// '--disable-setuid-sandbox',
+				// '--disable-dev-shm-usage',
+				// '--disable-gpu',
+				// '--no-zygote',
+				// '--single-process'
 			]
 		};
 	}

@@ -10,7 +10,7 @@
 		"node": "22.11.0"
 	},
 	"scripts": {
-		"heroku-postbuild": "npm run build && mkdir ./.cache && mv /app/.cache/puppeteer ./.cache",
+		"heroku-postbuild": "yarn build && mkdir ./.cache && mv /app/.cache/puppeteer ./.cache",
 		"dev": "nodemon",
 		"start": "node dist/index.js",
 		"build": "rimraf dist && tsc",
