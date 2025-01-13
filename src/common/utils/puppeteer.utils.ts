@@ -24,7 +24,7 @@ const getBrowserConfig = () => {
 		return {
 			headless: true,
 			devtools: false,
-			// executablePath: process.env.CHROME_BIN ?? '/app/.chrome-for-testing/chrome-linux64/chrome',
+			executablePath: process.env.CHROME_BIN ?? '/app/.chrome-for-testing/chrome-linux64/chrome',
 			args: [
 				'--no-sandbox',
 				'--devtools-flags=disable'
@@ -37,7 +37,7 @@ const getBrowserConfig = () => {
 		};
 	}
 
-	return { headless: true };
+	return { headless: true, executablePath: process.env.CHROME_BIN ?? undefined };
 };
 
 const setConsoleEvents = (page: Page) => {
