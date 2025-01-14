@@ -1,6 +1,19 @@
-FROM node:22.11.0
+FROM node:22.11.0 AS base
 
-RUN echo "DATABASE_URL=$DATABASE_URL" && echo "PORT=$PORT"
+RUN apt-get update && apt-get install -y \
+	chromium \
+	libatk-bridge2.0-0 \
+	libatk1.0-0 \
+	libcups2 \
+	libdbus-1-3 \
+	libgconf-2-4 \
+	libgdk-pixbuf2.0-0 \
+	libnss3 \
+	libx11-xcb1 \
+	libxrandr2 \
+	libxss1 \
+	libxtst6 \
+	&& rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
