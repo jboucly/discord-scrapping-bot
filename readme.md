@@ -117,5 +117,5 @@ $ docker build -t discord-bot .
 Run the following command to start the docker container.
 
 ```bash
-$ docker run -d --name discord-bot-prd --env-file .env.prd discord-bot
+$ docker run -d --name discord-bot-prd --env-file .env.prd --add-host=host.docker.internal:host-gateway discord-bot
 ```
