@@ -103,3 +103,19 @@ $ yarn db:generate:create
 # To create and apply
 $ yarn db:generate:dev
 ```
+
+## Build docker image
+
+Create your `.env.prd` file with the following content from the `.env.example` file.
+
+Run the following command to build the docker image.
+
+```bash
+$ docker build -t discord-bot .
+```
+
+Run the following command to start the docker container.
+
+```bash
+$ docker run -d --name discord-bot-prd --env-file .env.prd discord-bot
+```

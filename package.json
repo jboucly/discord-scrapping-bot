@@ -14,7 +14,7 @@
 		"dev": "nodemon",
 		"start": "node dist/index.js",
 		"build": "rimraf dist && tsc",
-		"deploy": "yarn build && node dist/deploy-commands.js",
+		"deploy": "node dist/deploy-commands.js",
 		"prettier": "prettier --config ./.prettierrc --check \"src/**/*.ts\"",
 		"prettier:fix": "prettier --config ./.prettierrc --write \"src/**/*.ts\"",
 		"prisma": "prisma",
