@@ -1,9 +1,9 @@
 import { ICommand } from '@common/interfaces/command.interface';
-import { LbcTracker, PrismaClient } from '@prisma/client';
+import { AdTrackers, PrismaClient } from '@prisma/client';
 import { ChatInputCommandInteraction, Client, EmbedBuilder } from 'discord.js';
 import { isNil } from 'lodash';
 
-export class LBCTrackerListService implements ICommand {
+export class AdTrackerListService implements ICommand {
 	private readonly prismaClient = new PrismaClient();
 
 	constructor(
@@ -12,14 +12,14 @@ export class LBCTrackerListService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const alreadyExist = await this.prismaClient.lbcTracker.findMany({
+		const alreadyExist = await this.prismaClient.adTrackers.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 
 		if (isNil(alreadyExist) || alreadyExist.length === 0) {
 			await this.interaction.reply({
 				flags: 'Ephemeral',
-				content: '❌ You have no lbc tracker notification configured'
+				content: '❌ You have no ad tracker notification configured'
 			});
 			return;
 		}
@@ -31,22 +31,22 @@ export class LBCTrackerListService implements ICommand {
 		});
 	}
 
-	private createEmbeds(missions: LbcTracker[]): EmbedBuilder[] {
+	private createEmbeds(adTrackers: AdTrackers[]): EmbedBuilder[] {
 		const valToReturn: EmbedBuilder[] = [];
 
-		missions.forEach((realEstate) => {
+		adTrackers.forEach((adTracker) => {
 			const embed = new EmbedBuilder()
 				.setColor('#006F62')
 				.setTitle(
-					`Channel : ${(this.client.channels.cache.find((channel) => channel.id === realEstate.channelId) as any)?.name}`
+					`Channel : ${(this.client.channels.cache.find((channel) => channel.id === adTracker.channelId) as any)?.name}`
 				)
 				.setDescription(
 					`
-					Name : ${realEstate.name}
-					URL : ${realEstate.url}
+					Name : ${adTracker.name}
+					URL : ${adTracker.url}
 				`
 				)
-				.setTimestamp(realEstate.updatedAt);
+				.setTimestamp(adTracker.updatedAt);
 
 			valToReturn.push(embed);
 		});

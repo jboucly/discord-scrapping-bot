@@ -11,36 +11,36 @@ import {
 } from 'discord.js';
 import { isNumber } from 'lodash';
 
-export class LBCTrackerSearchDisabledService implements ICommand {
+export class AdTrackerSearchDisabledService implements ICommand {
 	constructor(
 		private readonly client: Client,
 		private readonly interaction: ChatInputCommandInteraction
 	) {}
 
 	public async execute(): Promise<void> {
-		const allSearchSaved = await prismaClient.lbcTracker.findMany({
+		const allSearchSaved = await prismaClient.adTrackers.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 
 		if (allSearchSaved.length === 0) {
 			await this.interaction.reply({
 				flags: 'Ephemeral',
-				content: '❌ You have no search lbc tracker notification configured'
+				content: '❌ You have no search ad tracker notification configured'
 			});
 			return;
 		}
 
 		const selectInput = new StringSelectMenuBuilder()
-			.setCustomId('removelbcTrackerSelect')
-			.setPlaceholder('Select a lbc tracker to remove')
+			.setCustomId('removeAdTrackerSelect')
+			.setPlaceholder('Select a ad tracker to remove')
 			.addOptions(
-				allSearchSaved.map((realEstate) =>
+				allSearchSaved.map((adToSearch) =>
 					new StringSelectMenuOptionBuilder()
 						.setLabel(
-							`Channel : ${(this.client.channels.cache.find((channel) => channel.id === realEstate.channelId) as any)?.name}`
+							`Channel : ${(this.client.channels.cache.find((channel) => channel.id === adToSearch.channelId) as any)?.name}`
 						)
-						.setDescription(realEstate.name)
-						.setValue(realEstate.id.toString())
+						.setDescription(adToSearch.name)
+						.setValue(adToSearch.id.toString())
 				)
 			);
 
@@ -62,17 +62,17 @@ export class LBCTrackerSearchDisabledService implements ICommand {
 		})) as StringSelectMenuInteraction;
 
 		try {
-			const realEstateIdToRemove = Number(confirmation.values[0]);
+			const adTrackerIdToRemove = Number(confirmation.values[0]);
 
-			if (isNumber(realEstateIdToRemove) && !isNaN(realEstateIdToRemove)) {
-				await prismaClient.lbcTracker.deleteMany({
+			if (isNumber(adTrackerIdToRemove) && !isNaN(adTrackerIdToRemove)) {
+				await prismaClient.adTrackers.deleteMany({
 					where: {
-						id: realEstateIdToRemove
+						id: adTrackerIdToRemove
 					}
 				});
 
 				await confirmation.update({
-					content: '🚀 Notification lbc tracker removed',
+					content: '🚀 Notification ad tracker removed',
 					components: []
 				});
 			}

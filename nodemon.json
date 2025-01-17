@@ -1,6 +1,6 @@
 {
 	"ext": ".ts,.js",
 	"watch": ["src"],
-	"exec": "yarn deploy && node --inspect=9234 dist/index.js",
+	"exec": "yarn build && yarn deploy && node --inspect=9234 dist/index.js",
 	"ignore": [".git", "node_modules/**/node_modules"]
 }

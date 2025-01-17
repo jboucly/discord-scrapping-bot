@@ -1,6 +1,6 @@
 import { prismaClient } from '@common/clients/prisma.client';
 import { ICommand } from '@common/interfaces/command.interface';
-import { LbcTracker } from '@prisma/client';
+import { AdTrackers } from '@prisma/client';
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
@@ -14,9 +14,9 @@ import {
 	TextInputStyle
 } from 'discord.js';
 
-export class LBCTrackerUpdateService implements ICommand {
+export class AdTrackerUpdateService implements ICommand {
 	private modalId: string;
-	private realEstateToUpdate: LbcTracker;
+	private adToUpdate: AdTrackers;
 
 	private readonly modalInputId = {
 		name: 'nameInput',
@@ -29,39 +29,39 @@ export class LBCTrackerUpdateService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const allLbctrackerSaved = await prismaClient.lbcTracker.findMany({
+		const allAdTrackerSaved = await prismaClient.adTrackers.findMany({
 			where: { userId: this.interaction.user.id }
 		});
 
-		if (allLbctrackerSaved.length === 0) {
+		if (allAdTrackerSaved.length === 0) {
 			await this.interaction.reply({
-				content: '❌ You have no lbc tracker notification configured',
+				content: '❌ You have no ad tracker notification configured',
 				ephemeral: true
 			});
 			return;
 		}
 
 		console.log(
-			allLbctrackerSaved.map((lbcTracker) => {
+			allAdTrackerSaved.map((adTracker) => {
 				return new StringSelectMenuOptionBuilder()
-					.setDescription(`Name : ${lbcTracker.name}`)
+					.setDescription(`Name : ${adTracker.name}`)
 					.setEmoji('🏠')
-					.setValue(`${lbcTracker.id}`);
+					.setValue(`${adTracker.id}`);
 			})
 		);
 
 		const selectInput = new StringSelectMenuBuilder()
 			.setCustomId('updateRealEstateSelect')
-			.setPlaceholder('Select a lbc tracker to update')
+			.setPlaceholder('Select a ad tracker to update')
 			.addOptions(
-				allLbctrackerSaved.map((realEstate) =>
+				allAdTrackerSaved.map((adTracker) =>
 					new StringSelectMenuOptionBuilder()
-						.setLabel(`Name : ${realEstate.name}`)
+						.setLabel(`Name : ${adTracker.name}`)
 						.setDescription(
-							`Url : ${realEstate.url.length > 100 ? realEstate.url.slice(0, 80) + '...' : realEstate.url}`
+							`Url : ${adTracker.url.length > 100 ? adTracker.url.slice(0, 80) + '...' : adTracker.url}`
 						)
 						.setEmoji('🏠')
-						.setValue(`${realEstate.id}`)
+						.setValue(`${adTracker.id}`)
 				)
 			);
 
@@ -70,7 +70,7 @@ export class LBCTrackerUpdateService implements ICommand {
 		const response = await this.interaction.reply({
 			flags: 'Ephemeral',
 			components: [actionRow as any],
-			content: 'Choose lbc tracker to update :'
+			content: 'Choose ad tracker to update :'
 		});
 
 		await this.setSelectEvent(response);
@@ -83,15 +83,15 @@ export class LBCTrackerUpdateService implements ICommand {
 		})) as StringSelectMenuInteraction;
 
 		try {
-			const realEstateIdToUpdate = Number(selectMenuInteraction.values[0]);
-			const realEstataToUpdate = await prismaClient.lbcTracker.findUnique({
+			const adTrackerIdToUpdate = Number(selectMenuInteraction.values[0]);
+			const adTrackerToUpdate = await prismaClient.adTrackers.findUnique({
 				where: {
-					id: realEstateIdToUpdate
+					id: adTrackerIdToUpdate
 				}
 			});
 
-			if (!realEstataToUpdate) throw new Error('Real estate not found');
-			this.realEstateToUpdate = realEstataToUpdate;
+			if (!adTrackerToUpdate) throw new Error('Real estate not found');
+			this.adToUpdate = adTrackerToUpdate;
 
 			const modal = this.constructModal();
 			await selectMenuInteraction.showModal(modal);
@@ -108,12 +108,12 @@ export class LBCTrackerUpdateService implements ICommand {
 	private constructModal(): ModalBuilder {
 		this.modalId = `updateMissionModal-${this.interaction.user.id}`;
 
-		const modal = new ModalBuilder().setCustomId(this.modalId).setTitle('Update lbc tracker notification');
+		const modal = new ModalBuilder().setCustomId(this.modalId).setTitle('Update ad tracker notification');
 
 		const realEstateNameInput = new TextInputBuilder()
 			.setCustomId(this.modalInputId.name)
 			.setLabel('Set name of your notification')
-			.setValue(this.realEstateToUpdate.name)
+			.setValue(this.adToUpdate.name)
 			.setRequired(true)
 			.setPlaceholder('My real estate')
 			.setStyle(TextInputStyle.Short);
@@ -121,7 +121,7 @@ export class LBCTrackerUpdateService implements ICommand {
 		const realEstateUrlInput = new TextInputBuilder()
 			.setCustomId(this.modalInputId.url)
 			.setLabel('Set url of your notification')
-			.setValue(this.realEstateToUpdate.url)
+			.setValue(this.adToUpdate.url)
 			.setRequired(true)
 			.setPlaceholder('https://www.leboncoin.fr')
 			.setStyle(TextInputStyle.Short);
@@ -144,9 +144,9 @@ export class LBCTrackerUpdateService implements ICommand {
 		const name = modalInteraction.fields.getTextInputValue(this.modalInputId.name);
 		const url = modalInteraction.fields.getTextInputValue(this.modalInputId.url);
 
-		await prismaClient.lbcTracker.update({
+		await prismaClient.adTrackers.update({
 			where: {
-				id: this.realEstateToUpdate.id
+				id: this.adToUpdate.id
 			},
 			data: { name, url }
 		});
@@ -154,7 +154,7 @@ export class LBCTrackerUpdateService implements ICommand {
 		await modalInteraction.reply({
 			flags: 'Ephemeral',
 			withResponse: true,
-			content: '🚀 Notification lbc tracker updated'
+			content: '🚀 Notification ad tracker updated'
 		});
 	}
 }

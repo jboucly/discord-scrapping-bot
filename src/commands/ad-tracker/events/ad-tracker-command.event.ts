@@ -2,56 +2,56 @@ import { prismaClient } from '@common/clients/prisma.client';
 import puppeteer, { sleep } from '@common/clients/puppeteer.client';
 import { IEvent } from '@common/interfaces/event.interface';
 import { PuppeteerUtils } from '@common/utils/puppeteer.utils';
-import { LbcTracker, TreatyAdLbcTracker } from '@prisma/client';
+import { AdTrackers, TreatyAdTracker } from '@prisma/client';
 import { CronJob } from 'cron';
 import { format } from 'date-fns';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
 import { Ad } from '../types/ad.type';
 
-export class LBCTrackerCommandEvent implements IEvent {
+export class AdTrackerCommandEvent implements IEvent {
 	public async startCronJobs(client: Client): Promise<void> {
-		const crontab = process.env.LBC_TRACKER_CRON;
-		if (isNil(crontab)) throw new Error('Crontab for lbc tracker not found');
+		const crontab = process.env.AD_TRACKER_CRON;
+		if (isNil(crontab)) throw new Error('Crontab for ad tracker not found');
 
 		const cron = new CronJob(crontab, async () => {
 			await this.sendAdsNotifications(client);
 		});
 
 		cron.start();
-		console.info('\nℹ️  LBC Tracker cron jobs started with crontab :', crontab, '\n');
+		console.info('\nℹ️  Ad Tracker cron jobs started with crontab :', crontab, '\n');
 	}
 
 	private async sendAdsNotifications(client: Client): Promise<void> {
 		let nbMessage = 0;
-		const allLbcTracker = await prismaClient.lbcTracker.findMany({
-			include: { TreatyAdLbcTracker: true }
+		const allAdTracker = await prismaClient.adTrackers.findMany({
+			include: { TreatyAdTracker: true }
 		});
 
-		for await (const lbcTracker of allLbcTracker) {
-			const ads = await this.getLBCAds(lbcTracker);
+		for await (const adTracker of allAdTracker) {
+			const ads = await this.getLBCAds(adTracker);
 
 			const channel = client.channels.cache.find(
-				(channel: any) => channel.id === lbcTracker.channelId
+				(channel: any) => channel.id === adTracker.channelId
 			) as TextChannel;
 
 			if (isNil(channel)) {
-				console.error('[LBC TRACKER EVENT] - Channel not found');
+				console.error('[Ad TRACKER EVENT] - Channel not found');
 				return;
 			}
 
 			for await (const ad of ads) {
-				const treatyAd = await prismaClient.treatyAdLbcTracker.findFirst({
-					where: { lbcTrackerId: lbcTracker.id, url: ad.url }
+				const treatyAd = await prismaClient.treatyAdTracker.findFirst({
+					where: { adTrackerId: adTracker.id, url: ad.url }
 				});
 
 				if (!treatyAd) {
-					await this.saveTreatyAds(ad, lbcTracker.id);
+					await this.saveTreatyAds(ad, adTracker.id);
 					const embedMessage = this.createEmbeds(ad);
 
 					await channel.send({
 						embeds: [embedMessage],
-						content: `Nouvelle annonces pour la recherche : ${lbcTracker.name} 🚀`
+						content: `Nouvelle annonces pour la recherche : ${adTracker.name} 🚀`
 					});
 					nbMessage++;
 				}
@@ -59,21 +59,21 @@ export class LBCTrackerCommandEvent implements IEvent {
 		}
 
 		console.info(
-			`ℹ️  ${nbMessage} lbc ads notification send \n⏰ ${format(
+			`ℹ️  ${nbMessage} ad ads notification send \n⏰ ${format(
 				new Date(),
 				'dd/MM/yyyy HH:mm:ss'
 			)}\n———————————————————————————————————————————————————————————`
 		);
 	}
 
-	private async getLBCAds(lbcTracker: LbcTracker): Promise<Ad[]> {
+	private async getLBCAds(adTracker: AdTrackers): Promise<Ad[]> {
 		const browser = await puppeteer.launch(PuppeteerUtils.getBrowserConfig());
 		const page = await browser.newPage();
 		// PuppeteerUtils.setConsoleEvents(page);
 
 		try {
 			await page.setViewport({ width: 1080, height: 1024 });
-			await page.goto(lbcTracker.url, { waitUntil: 'domcontentloaded' });
+			await page.goto(adTracker.url, { waitUntil: 'domcontentloaded' });
 			await sleep(Math.random() * 2000 + 1000);
 
 			// Load all ads
@@ -113,11 +113,11 @@ export class LBCTrackerCommandEvent implements IEvent {
 		}
 	}
 
-	private async saveTreatyAds(ad: Ad, lbcTrackerId: number): Promise<TreatyAdLbcTracker> {
-		return prismaClient.treatyAdLbcTracker.create({
+	private async saveTreatyAds(ad: Ad, adTrackerId: number): Promise<TreatyAdTracker> {
+		return prismaClient.treatyAdTracker.create({
 			data: {
 				url: ad.url,
-				lbcTrackerId,
+				adTrackerId,
 				price: ad.price,
 				title: ad.title,
 				imageUrl: ad.img,

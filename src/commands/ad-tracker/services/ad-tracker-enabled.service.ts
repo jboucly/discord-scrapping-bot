@@ -3,17 +3,17 @@ import { ICommand } from '@common/interfaces/command.interface';
 import { isValidHttpUrl } from '@common/utils/string.utils';
 import { CacheType, ChatInputCommandInteraction, CommandInteractionOption } from 'discord.js';
 import { isNil } from 'lodash';
-import { LBCTrackerOption } from '../enums/lbc-tracker-option.enum';
+import { AdTrackerOption } from '../enums/ad-tracker-option.enum';
 
-export class LBCTrackerEnabledService implements ICommand {
+export class AdTrackerEnabledService implements ICommand {
 	constructor(private readonly interaction: ChatInputCommandInteraction) {}
 
 	public async execute(optChannel: readonly CommandInteractionOption<CacheType>[]): Promise<void> {
-		const channelId = optChannel.find((e) => e.name === LBCTrackerOption.CHANNEL)?.value as string;
-		const name = optChannel.find((e) => e.name === LBCTrackerOption.NAME)?.value as string;
-		const urlToSearch = optChannel.find((e) => e.name === LBCTrackerOption.URL)?.value as string;
+		const channelId = optChannel.find((e) => e.name === AdTrackerOption.CHANNEL)?.value as string;
+		const name = optChannel.find((e) => e.name === AdTrackerOption.NAME)?.value as string;
+		const urlToSearch = optChannel.find((e) => e.name === AdTrackerOption.URL)?.value as string;
 
-		const alreadyExist = await prismaClient.lbcTracker.findFirst({
+		const alreadyExist = await prismaClient.adTrackers.findFirst({
 			where: {
 				channelId,
 				userId: this.interaction.user.id
@@ -30,7 +30,7 @@ export class LBCTrackerEnabledService implements ICommand {
 		}
 
 		if (!isNil(alreadyExist)) {
-			await prismaClient.lbcTracker.update({
+			await prismaClient.adTrackers.update({
 				where: {
 					id: alreadyExist.id
 				},
@@ -41,7 +41,7 @@ export class LBCTrackerEnabledService implements ICommand {
 				}
 			});
 		} else {
-			await prismaClient.lbcTracker.create({
+			await prismaClient.adTrackers.create({
 				data: {
 					channelId,
 					name: name,
@@ -52,7 +52,7 @@ export class LBCTrackerEnabledService implements ICommand {
 		}
 
 		await this.interaction.reply({
-			content: `🚀 Notification for search lbc tracker enabled with name : ${name}`,
+			content: `🚀 Notification for search ad tracker enabled with name : ${name}`,
 			flags: 'Ephemeral',
 			withResponse: true
 		});

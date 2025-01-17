@@ -46,28 +46,28 @@ model Daily {
     message     String   @db.VarChar(255)
 }
 
-model LbcTracker {
-    id                 Int                  @id @default(autoincrement())
-    createdAt          DateTime             @default(now()) @db.Timestamptz(6)
-    updatedAt          DateTime             @updatedAt @db.Timestamptz(6)
-    url                String               @unique @db.VarChar(255)
-    name               String               @db.VarChar(255)
-    channelId          String               @db.VarChar(255)
-    userId             String               @db.VarChar(255)
-    TreatyAdLbcTracker TreatyAdLbcTracker[]
+model AdTrackers {
+    id              Int               @id @default(autoincrement())
+    createdAt       DateTime          @default(now()) @db.Timestamptz(6)
+    updatedAt       DateTime          @updatedAt @db.Timestamptz(6)
+    url             String            @unique @db.VarChar(255)
+    name            String            @db.VarChar(255)
+    channelId       String            @db.VarChar(255)
+    userId          String            @db.VarChar(255)
+    TreatyAdTracker TreatyAdTracker[]
 }
 
-model TreatyAdLbcTracker {
-    id           Int      @id @default(autoincrement())
-    createdAt    DateTime @default(now()) @db.Timestamptz(6)
-    updatedAt    DateTime @updatedAt @db.Timestamptz(6)
-    url          String?  @db.VarChar(255)
-    title        String?  @db.VarChar(255)
-    price        String?  @db.VarChar(50)
-    pricePerM2   String?  @db.VarChar(50)
-    imageUrl     String?  @db.VarChar(255)
-    location     String?  @db.VarChar(255)
-    lbcTrackerId Int
+model TreatyAdTracker {
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+    url         String?  @db.VarChar(255)
+    title       String?  @db.VarChar(255)
+    price       String?  @db.VarChar(50)
+    pricePerM2  String?  @db.VarChar(50)
+    imageUrl    String?  @db.VarChar(255)
+    location    String?  @db.VarChar(255)
+    adTrackerId Int
 
-    LbcTracker LbcTracker @relation(fields: [lbcTrackerId], references: [id], onDelete: Cascade)
+    AdTracker AdTrackers @relation(fields: [adTrackerId], references: [id], onDelete: Cascade)
 }
