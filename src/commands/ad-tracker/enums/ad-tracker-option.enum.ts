@@ -1,5 +1,6 @@
 export enum AdTrackerOption {
 	CHANNEL = 'channel',
 	URL = 'url',
-	NAME = 'name'
+	NAME = 'name',
+	TYPE = 'type'
 }

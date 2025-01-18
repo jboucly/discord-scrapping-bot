@@ -1,7 +1,7 @@
 import { ICommand } from '@common/interfaces/command.interface';
 import { CommandOptionsUtils } from '@common/utils/command-options.utils';
 import { ChatInputCommandInteraction, Client } from 'discord.js';
-import { AdTrackerType } from '../enums/ad-tracker-type.enum';
+import { AdTrackerCommandType } from '../enums/ad-tracker-command-type.enum';
 import { AdTrackerSearchDisabledService } from './ad-tracker-disabled.service';
 import { AdTrackerEnabledService } from './ad-tracker-enabled.service';
 import { AdTrackerListService } from './ad-tracker-list.service';
@@ -19,18 +19,18 @@ export class AdTrackerService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const list = CommandOptionsUtils.getNotRequired(this.interaction, AdTrackerType.LIST);
-		const update = CommandOptionsUtils.getNotRequired(this.interaction, AdTrackerType.UPDATE);
-		const enabled = CommandOptionsUtils.getNotRequired(this.interaction, AdTrackerType.ENABLED);
-		const disabled = CommandOptionsUtils.getNotRequired(this.interaction, AdTrackerType.DISABLED);
+		const list = CommandOptionsUtils.getNotRequired(this.interaction, AdTrackerCommandType.LIST);
+		const update = CommandOptionsUtils.getNotRequired(this.interaction, AdTrackerCommandType.UPDATE);
+		const enabled = CommandOptionsUtils.getNotRequired(this.interaction, AdTrackerCommandType.ENABLED);
+		const disabled = CommandOptionsUtils.getNotRequired(this.interaction, AdTrackerCommandType.DISABLED);
 
-		if (enabled?.name === AdTrackerType.ENABLED && enabled?.options) {
+		if (enabled?.name === AdTrackerCommandType.ENABLED && enabled?.options) {
 			return await this.adTrackerEnabledService.execute(enabled.options);
-		} else if (disabled?.name === AdTrackerType.DISABLED) {
+		} else if (disabled?.name === AdTrackerCommandType.DISABLED) {
 			return await this.adTrackerDisabledService.execute();
-		} else if (list?.name === AdTrackerType.LIST) {
+		} else if (list?.name === AdTrackerCommandType.LIST) {
 			return await this.adTrackerListService.execute();
-		} else if (update?.name === AdTrackerType.UPDATE) {
+		} else if (update?.name === AdTrackerCommandType.UPDATE) {
 			return await this.adTrackerUpdateService.execute();
 		}
 	}

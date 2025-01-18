@@ -2,6 +2,7 @@ import { ICommand } from '@common/interfaces/command.interface';
 import { AdTrackers, PrismaClient } from '@prisma/client';
 import { ChatInputCommandInteraction, Client, EmbedBuilder } from 'discord.js';
 import { isNil } from 'lodash';
+import { getAdTrackerTypeTranslated } from '../utils/ad-tracker-type.utils';
 
 export class AdTrackerListService implements ICommand {
 	private readonly prismaClient = new PrismaClient();
@@ -43,6 +44,7 @@ export class AdTrackerListService implements ICommand {
 				.setDescription(
 					`
 					Name : ${adTracker.name}
+					Type : ${getAdTrackerTypeTranslated(adTracker.type)}
 					URL : ${adTracker.url}
 				`
 				)

@@ -54,6 +54,7 @@ model AdTrackers {
     name            String            @db.VarChar(255)
     channelId       String            @db.VarChar(255)
     userId          String            @db.VarChar(255)
+    type            AdTrackerType
     TreatyAdTracker TreatyAdTracker[]
 }
 
@@ -70,4 +71,9 @@ model TreatyAdTracker {
     adTrackerId Int
 
     AdTracker AdTrackers @relation(fields: [adTrackerId], references: [id], onDelete: Cascade)
+}
+
+enum AdTrackerType {
+    LBC
+    SE_LOGER
 }

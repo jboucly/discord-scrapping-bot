@@ -13,6 +13,7 @@ import {
 	TextInputBuilder,
 	TextInputStyle
 } from 'discord.js';
+import { CheckUrlAdTrackerUtil } from '../utils/check-url-ad-tracker.util';
 
 export class AdTrackerUpdateService implements ICommand {
 	private modalId: string;
@@ -41,15 +42,6 @@ export class AdTrackerUpdateService implements ICommand {
 			return;
 		}
 
-		console.log(
-			allAdTrackerSaved.map((adTracker) => {
-				return new StringSelectMenuOptionBuilder()
-					.setDescription(`Name : ${adTracker.name}`)
-					.setEmoji('🏠')
-					.setValue(`${adTracker.id}`);
-			})
-		);
-
 		const selectInput = new StringSelectMenuBuilder()
 			.setCustomId('updateRealEstateSelect')
 			.setPlaceholder('Select a ad tracker to update')
@@ -58,7 +50,7 @@ export class AdTrackerUpdateService implements ICommand {
 					new StringSelectMenuOptionBuilder()
 						.setLabel(`Name : ${adTracker.name}`)
 						.setDescription(
-							`Url : ${adTracker.url.length > 100 ? adTracker.url.slice(0, 80) + '...' : adTracker.url}`
+							`Type : ${adTracker.type} |  Url : ${adTracker.url.length > 100 ? adTracker.url.slice(0, 70) + '...' : adTracker.url}`
 						)
 						.setEmoji('🏠')
 						.setValue(`${adTracker.id}`)
@@ -90,7 +82,7 @@ export class AdTrackerUpdateService implements ICommand {
 				}
 			});
 
-			if (!adTrackerToUpdate) throw new Error('Real estate not found');
+			if (!adTrackerToUpdate) throw new Error('Ad tracker not found');
 			this.adToUpdate = adTrackerToUpdate;
 
 			const modal = this.constructModal();
@@ -98,7 +90,7 @@ export class AdTrackerUpdateService implements ICommand {
 			await this.setModalSubmitEvent();
 		} catch (e) {
 			await selectMenuInteraction.update({
-				content: 'Error while updating real estate',
+				content: 'Error while updating ad tracker',
 				components: []
 			});
 			return;
@@ -108,17 +100,17 @@ export class AdTrackerUpdateService implements ICommand {
 	private constructModal(): ModalBuilder {
 		this.modalId = `updateMissionModal-${this.interaction.user.id}`;
 
-		const modal = new ModalBuilder().setCustomId(this.modalId).setTitle('Update ad tracker notification');
+		const modal = new ModalBuilder().setCustomId(this.modalId).setTitle('Update ad tracker notification !');
 
-		const realEstateNameInput = new TextInputBuilder()
+		const adTrackerNameInput = new TextInputBuilder()
 			.setCustomId(this.modalInputId.name)
 			.setLabel('Set name of your notification')
 			.setValue(this.adToUpdate.name)
 			.setRequired(true)
-			.setPlaceholder('My real estate')
+			.setPlaceholder('My ad tracker')
 			.setStyle(TextInputStyle.Short);
 
-		const realEstateUrlInput = new TextInputBuilder()
+		const adTrackerUrlInput = new TextInputBuilder()
 			.setCustomId(this.modalInputId.url)
 			.setLabel('Set url of your notification')
 			.setValue(this.adToUpdate.url)
@@ -126,8 +118,8 @@ export class AdTrackerUpdateService implements ICommand {
 			.setPlaceholder('https://www.leboncoin.fr')
 			.setStyle(TextInputStyle.Short);
 
-		const actionRow1 = new ActionRowBuilder<TextInputBuilder>().addComponents(realEstateNameInput);
-		const actionRow2 = new ActionRowBuilder<TextInputBuilder>().addComponents(realEstateUrlInput);
+		const actionRow1 = new ActionRowBuilder<TextInputBuilder>().addComponents(adTrackerNameInput);
+		const actionRow2 = new ActionRowBuilder<TextInputBuilder>().addComponents(adTrackerUrlInput);
 
 		modal.addComponents(actionRow1, actionRow2);
 
@@ -144,17 +136,25 @@ export class AdTrackerUpdateService implements ICommand {
 		const name = modalInteraction.fields.getTextInputValue(this.modalInputId.name);
 		const url = modalInteraction.fields.getTextInputValue(this.modalInputId.url);
 
-		await prismaClient.adTrackers.update({
-			where: {
-				id: this.adToUpdate.id
-			},
-			data: { name, url }
-		});
+		if (!CheckUrlAdTrackerUtil(url, this.adToUpdate.type)) {
+			await modalInteraction.reply({
+				flags: 'Ephemeral',
+				withResponse: true,
+				content: '❌ Url not valid for this type of ad tracker. Please check the url and try again'
+			});
+		} else {
+			await prismaClient.adTrackers.update({
+				where: {
+					id: this.adToUpdate.id
+				},
+				data: { name, url }
+			});
 
-		await modalInteraction.reply({
-			flags: 'Ephemeral',
-			withResponse: true,
-			content: '🚀 Notification ad tracker updated'
-		});
+			await modalInteraction.reply({
+				flags: 'Ephemeral',
+				withResponse: true,
+				content: '🚀 Notification ad tracker updated'
+			});
+		}
 	}
 }

@@ -1,7 +1,8 @@
 import { ChannelType, ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
+import { AdTrackerCommandType } from './enums/ad-tracker-command-type.enum';
 import { AdTrackerOption } from './enums/ad-tracker-option.enum';
-import { AdTrackerType } from './enums/ad-tracker-type.enum';
 import { AdTrackerService } from './services/ad-tracker.service';
+import { GetAdTrackerTypeChoice } from './utils/ad-tracker-type.utils';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -9,7 +10,7 @@ export default {
 		.setDescription('Configure your search ad notification 🔥')
 		.addSubcommand((subcommand) =>
 			subcommand
-				.setName(AdTrackerType.ENABLED)
+				.setName(AdTrackerCommandType.ENABLED)
 				.setDescription('Enable search ad notification')
 				.addStringOption((opts) =>
 					opts.setName(AdTrackerOption.NAME).setDescription('Set name to search').setRequired(true)
@@ -24,15 +25,22 @@ export default {
 				.addStringOption((opts) =>
 					opts.setName(AdTrackerOption.URL).setDescription('Set channel to send all ads').setRequired(true)
 				)
+				.addStringOption((opts) =>
+					opts
+						.setName(AdTrackerOption.TYPE)
+						.setDescription('Set website for your search')
+						.setRequired(true)
+						.setChoices(GetAdTrackerTypeChoice())
+				)
 		)
 		.addSubcommand((subcommand) =>
-			subcommand.setName(AdTrackerType.DISABLED).setDescription('Disable search ad notification')
+			subcommand.setName(AdTrackerCommandType.DISABLED).setDescription('Disable search ad notification')
 		)
 		.addSubcommand((subcommand) =>
-			subcommand.setName(AdTrackerType.LIST).setDescription('List all search ads notifications')
+			subcommand.setName(AdTrackerCommandType.LIST).setDescription('List all search ads notifications')
 		)
 		.addSubcommand((subcommand) =>
-			subcommand.setName(AdTrackerType.UPDATE).setDescription('Update your search ads')
+			subcommand.setName(AdTrackerCommandType.UPDATE).setDescription('Update your search ads')
 		)
 		.toJSON(),
 

@@ -1,6 +1,4 @@
-export enum AdTrackerType {
-	ENABLED = 'enabled',
-	DISABLED = 'disabled',
-	LIST = 'list',
-	UPDATE = 'update'
+export enum AdTrackerTypeEnum {
+	LBC = 'LBC',
+	SE_LOGER = 'SE_LOGER'
 }

@@ -1,6 +1,7 @@
 import { prismaClient } from '@common/clients/prisma.client';
 import { ICommand } from '@common/interfaces/command.interface';
 import { isValidHttpUrl } from '@common/utils/string.utils';
+import { AdTrackerType } from '@prisma/client';
 import { CacheType, ChatInputCommandInteraction, CommandInteractionOption } from 'discord.js';
 import { isNil } from 'lodash';
 import { AdTrackerOption } from '../enums/ad-tracker-option.enum';
@@ -12,6 +13,7 @@ export class AdTrackerEnabledService implements ICommand {
 		const channelId = optChannel.find((e) => e.name === AdTrackerOption.CHANNEL)?.value as string;
 		const name = optChannel.find((e) => e.name === AdTrackerOption.NAME)?.value as string;
 		const urlToSearch = optChannel.find((e) => e.name === AdTrackerOption.URL)?.value as string;
+		const type = optChannel.find((e) => e.name === AdTrackerOption.TYPE)?.value as AdTrackerType;
 
 		const alreadyExist = await prismaClient.adTrackers.findFirst({
 			where: {
@@ -36,6 +38,7 @@ export class AdTrackerEnabledService implements ICommand {
 				},
 				data: {
 					name,
+					type,
 					url: urlToSearch,
 					userId: this.interaction.user.id
 				}
@@ -43,6 +46,7 @@ export class AdTrackerEnabledService implements ICommand {
 		} else {
 			await prismaClient.adTrackers.create({
 				data: {
+					type,
 					channelId,
 					name: name,
 					url: urlToSearch,
