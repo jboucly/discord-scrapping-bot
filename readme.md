@@ -18,10 +18,13 @@
 ## Description
 
 Discord bot with several functionalities for web development.
+It includes various features ranging from freelance mission notifications to new ad notifications on online sales sites. It also allows for some jokes to lighten the mood on Discord servers, such as "Quoi ?" => "FEUR !".
 
-### Commands :
+## Features
 
-1. Daily command :
+### Notifications :
+
+#### Daily command :
 
 Command allowing the configuration of a daily reminder. (agile methodology)
 
@@ -38,7 +41,7 @@ Example :
 /daily disabled
 ```
 
-2. Mission command :
+#### Mission command :
 
 If you are freelance and looking for a new mission, this command will allow you to receive the latest available missions based on the keywords you give them.
 
@@ -58,33 +61,73 @@ Example :
 /daily update
 ```
 
-3. LBC tracker command :
+#### Ads tracker command :
 
-If you want to have notifications of the latest LBC announcements you can set it up !!
+If you want to have notifications of the latest LBC or other announcements you can set it up !!
 
 Example :
 
 ```bash
-# List all lbc trackers notifications configured
+# List all ads trackers notifications configured
 /lbc-tracker list
 
-# Configure lbc trackers ads notification
+# Configure ads trackers ads notification
 /lbc-tracker enabled
 
-# Remove lbc trackers notification
+# Remove ads trackers notification
 /lbc-tracker disabled
 
-# Update lbc trackers notification
+# Update ads trackers notification
 /lbc-tracker update
 ```
 
-## Installation
+## Development
+
+### Prerequisites
+
+- Node.js
+- Yarn
+- Docker
+- Docker-compose
+- Discord bot token
+- Discord bot client id
+- Discord bot public key
+- Discord bot guild id
+
+### Installation
+
+Install dependencies :
 
 ```bash
 $ yarn --frozen-lockfile
 ```
 
-## Running the app
+Create your `.env` file with the following content from the `.env.example` file.
+Replace the values with your own.
+
+```bash
+$ cp .env.example .env
+```
+
+Run your local database with or without PgAdmin :
+
+```bash
+# Run database with PgAdmin
+$ docker-compose up -d
+
+# Run database without PgAdmin
+$ docker-compose up -d postgresql
+```
+
+### Running the app
+
+Before running the app, you need to generate the Prisma client.
+
+```bash
+$ yarn db:generate
+```
+
+Run the app :
 
 ```bash
 # development
@@ -94,14 +137,25 @@ $ yarn dev
 $ yarn build && yarn start
 ```
 
-## Generate Prisma client
+If you want to run the bot with debug mode, you can run with F5 in VSCode.
+
+### Prisma
 
 ```bash
-# To create only
-$ yarn db:generate:create
+# To generate client
+$ yarn db:generate
 
-# To create and apply
-$ yarn db:generate:dev
+# To deploy migration
+$ yarn db:deploy
+
+# To reset migration
+$ yarn db:migrate:reset
+
+# To create only migration
+$ yarn db:migrate:create
+
+# To apply migration
+$ yarn db:migrate:dev
 ```
 
 ## Build docker image
