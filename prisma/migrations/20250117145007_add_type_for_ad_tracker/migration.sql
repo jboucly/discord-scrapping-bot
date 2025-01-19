@@ -1,7 +1,7 @@
 -- CreateEnum
 CREATE TYPE "AdTrackerType" AS ENUM(
     'LBC',
-    'SE_LOGER'
+    'OUEST_FRANCE_IMMO'
 );
 
 -- AlterTable

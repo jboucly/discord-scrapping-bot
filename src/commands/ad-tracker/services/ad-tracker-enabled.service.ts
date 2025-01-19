@@ -5,6 +5,7 @@ import { AdTrackerType } from '@prisma/client';
 import { CacheType, ChatInputCommandInteraction, CommandInteractionOption } from 'discord.js';
 import { isNil } from 'lodash';
 import { AdTrackerOption } from '../enums/ad-tracker-option.enum';
+import { CheckUrlAdTrackerUtil } from '../utils/check-url-ad-tracker.util';
 
 export class AdTrackerEnabledService implements ICommand {
 	constructor(private readonly interaction: ChatInputCommandInteraction) {}
@@ -22,7 +23,7 @@ export class AdTrackerEnabledService implements ICommand {
 			}
 		});
 
-		if (!isValidHttpUrl(urlToSearch)) {
+		if (!isValidHttpUrl(urlToSearch) || !CheckUrlAdTrackerUtil(urlToSearch, type)) {
 			await this.interaction.reply({
 				content: `❌ Invalid URL to search : ${urlToSearch}`,
 				flags: 'Ephemeral',

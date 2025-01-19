@@ -1,7 +1,8 @@
-import { Page } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import AdblockerPlugin from 'puppeteer-extra-plugin-adblocker';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { autoScroll } from './utils/autoscroll.utils';
+import { sleep } from './utils/sleep.utils';
 
 type Ad = {
 	url: string | null;
@@ -10,27 +11,6 @@ type Ad = {
 	price?: string;
 	pricePerM2?: string;
 	location?: string;
-};
-
-const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
-const autoScroll = async (page: Page) => {
-	await page.evaluate(async () => {
-		await new Promise((resolve) => {
-			var totalHeight = 0;
-			var distance = 100;
-			var timer = setInterval(() => {
-				var scrollHeight = document.body.scrollHeight;
-				window.scrollBy(0, distance);
-				totalHeight += distance;
-
-				if (totalHeight >= scrollHeight - window.innerHeight) {
-					clearInterval(timer);
-					resolve(null);
-				}
-			}, 100);
-		});
-	});
 };
 
 puppeteer.use(StealthPlugin());
@@ -52,8 +32,8 @@ puppeteer.launch({ headless: true }).then(async (browser) => {
 	page.on('console', async (msg) => {
 		const msgArgs = msg.args();
 
-		for (let i = 0; i < msgArgs.length; ++i) {
-			console.log(await msgArgs[i]?.jsonValue());
+		for (const element of msgArgs) {
+			console.log(await element?.jsonValue());
 		}
 	});
 

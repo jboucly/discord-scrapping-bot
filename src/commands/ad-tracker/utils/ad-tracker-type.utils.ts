@@ -10,10 +10,10 @@ export const GetAdTrackerTypeChoice = (): APIApplicationCommandOptionChoice<stri
 					value,
 					name: 'LeBonCoin'
 				};
-			case AdTrackerTypeEnum.SE_LOGER:
+			case AdTrackerTypeEnum.OUEST_FRANCE_IMMO:
 				return {
 					value,
-					name: 'Se Loger'
+					name: 'OuestFrance Immo'
 				};
 
 			default:
@@ -26,8 +26,8 @@ export const getAdTrackerTypeTranslated = (type: AdTrackerType | AdTrackerTypeEn
 	switch (type) {
 		case AdTrackerTypeEnum.LBC:
 			return 'LeBonCoin';
-		case AdTrackerTypeEnum.SE_LOGER:
-			return 'Se Loger';
+		case AdTrackerTypeEnum.OUEST_FRANCE_IMMO:
+			return 'OuestFrance Immo';
 
 		default:
 			throw new Error('Invalid ad tracker type');

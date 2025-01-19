@@ -1,15 +1,17 @@
 import { prismaClient } from '@common/clients/prisma.client';
 import { IEvent } from '@common/interfaces/event.interface';
-import { AdTrackers, TreatyAdTracker } from '@prisma/client';
+import { AdTrackers, AdTrackerType, TreatyAdTracker } from '@prisma/client';
 import { CronJob } from 'cron';
 import { format } from 'date-fns';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
 import { Ad } from '../types/ad.type';
 import { LbcTrackerProvider } from './providers/lbc-tracker.provider';
+import { OuestfranceImmoTrackerProvider } from './providers/ouestfrance-immo-tracker.provider';
 
 export class AdTrackerCommandEvent implements IEvent {
 	private lbcTrackerProvider = new LbcTrackerProvider();
+	private ouestfranceImmoTrackerProvider = new OuestfranceImmoTrackerProvider();
 
 	public async startCronJobs(client: Client): Promise<void> {
 		const crontab = process.env.AD_TRACKER_CRON;
@@ -48,7 +50,7 @@ export class AdTrackerCommandEvent implements IEvent {
 
 				if (!treatyAd) {
 					await this.saveTreatyAds(ad, adTracker.id);
-					const embedMessage = this.createEmbeds(ad);
+					const embedMessage = this.createEmbeds(ad, adTracker.type);
 
 					await channel.send({
 						embeds: [embedMessage],
@@ -67,16 +69,24 @@ export class AdTrackerCommandEvent implements IEvent {
 		);
 	}
 
+	/**
+	 * @description Get ads from ad tracker
+	 */
 	private async getAds(adTracker: AdTrackers): Promise<Ad[]> {
 		switch (adTracker.type) {
 			case 'LBC':
 				return await this.lbcTrackerProvider.getAds(adTracker);
+			case 'OUEST_FRANCE_IMMO':
+				return await this.ouestfranceImmoTrackerProvider.getAds(adTracker);
 
 			default:
 				throw new Error('[ADS TRACKER EVENT] - Type not found');
 		}
 	}
 
+	/**
+	 * @description Save ads treaty in database
+	 */
 	private async saveTreatyAds(ad: Ad, adTrackerId: number): Promise<TreatyAdTracker> {
 		return prismaClient.treatyAdTracker.create({
 			data: {
@@ -91,13 +101,16 @@ export class AdTrackerCommandEvent implements IEvent {
 		});
 	}
 
-	private createEmbeds(ad: Ad): EmbedBuilder {
+	/**
+	 * @description Create embeds for discord message
+	 */
+	private createEmbeds(ad: Ad, type: AdTrackerType): EmbedBuilder {
 		const price = ad.pricePerM2 ? `${ad.price} | ${ad.pricePerM2}` : `${ad.price}`;
 
 		const embed = new EmbedBuilder()
 			.setColor('#f56b2a')
 			.setTitle(`➡️ ${ad.title}`)
-			.setURL(`https://www.leboncoin.fr${ad.url}`)
+			.setURL(this.getUrl(ad.url, type))
 			.setFields([
 				{ name: 'Prix', value: price, inline: true },
 				{ name: 'Ville', value: `${ad.location}`, inline: true }
@@ -109,5 +122,19 @@ export class AdTrackerCommandEvent implements IEvent {
 		}
 
 		return embed;
+	}
+
+	/**
+	 * @description Get the url for the ad tracker
+	 */
+	private getUrl(url: string | null, adTrackerType: AdTrackerType): string {
+		switch (adTrackerType) {
+			case 'LBC':
+				return `https://www.leboncoin.fr${url}`;
+			case 'OUEST_FRANCE_IMMO':
+				return `https://www.ouestfrance-immo.com/${url}`;
+			default:
+				throw new Error('[ADS TRACKER EVENT] - Type not found for set url');
+		}
 	}
 }

@@ -75,5 +75,5 @@ model TreatyAdTracker {
 
 enum AdTrackerType {
     LBC
-    SE_LOGER
+    OUEST_FRANCE_IMMO
 }

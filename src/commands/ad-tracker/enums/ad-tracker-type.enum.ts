@@ -1,4 +1,4 @@
 export enum AdTrackerTypeEnum {
 	LBC = 'LBC',
-	SE_LOGER = 'SE_LOGER'
+	OUEST_FRANCE_IMMO = 'OUEST_FRANCE_IMMO'
 }
