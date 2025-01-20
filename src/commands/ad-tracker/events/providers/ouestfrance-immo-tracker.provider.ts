@@ -58,13 +58,10 @@ export class OuestfranceImmoTrackerProvider implements ITrackerProvider {
 			await browser.close();
 			return ads;
 		} catch (error) {
-			await page.screenshot({
-				path: `./screen/${new Date().toISOString()}-error-ouestfranceimmo.png`,
-				fullPage: true
-			});
 			await browser.close();
 
-			console.error('[ADS TRACKER EVENT] - Error while getting ads for Ouestfrance immo', error);
+			console.error('[ADS TRACKER EVENT] - Error while getting ads for Ouestfrance immo');
+			console.error(error);
 			return [];
 		}
 	}

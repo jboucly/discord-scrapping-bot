@@ -45,10 +45,10 @@ export class LbcTrackerProvider implements ITrackerProvider {
 			await browser.close();
 			return ads;
 		} catch (error) {
-			await page.screenshot({ path: `./screen/${new Date().toISOString()}-error-LBC.png`, fullPage: true });
 			await browser.close();
 
-			console.error('[ADS TRACKER EVENT] - Error while getting ads for LBC', error);
+			console.error('[ADS TRACKER EVENT] - Error while getting ads for LBC');
+			console.error(error);
 			return [];
 		}
 	}
