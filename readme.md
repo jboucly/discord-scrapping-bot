@@ -55,10 +55,10 @@ Example :
 /mission enabled
 
 # Remove mission notification
-/daily disabled
+/mission disabled
 
 # Update mission notification
-/daily update
+/mission update
 ```
 
 #### Ads tracker command :
@@ -69,16 +69,16 @@ Example :
 
 ```bash
 # List all ads trackers notifications configured
-/lbc-tracker list
+/ad-tracker list
 
 # Configure ads trackers ads notification
-/lbc-tracker enabled
+/ad-tracker enabled
 
 # Remove ads trackers notification
-/lbc-tracker disabled
+/ad-tracker disabled
 
 # Update ads trackers notification
-/lbc-tracker update
+/ad-tracker update
 ```
 
 ## Development
