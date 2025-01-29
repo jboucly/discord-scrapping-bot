@@ -20,7 +20,7 @@ export class LbcTrackerProvider implements ITrackerProvider {
 			await PuppeteerUtils.autoScroll(page);
 			await sleep(Math.random() * 2000 + 1000);
 
-			const ads: Ad[] = await page.$$eval('a[data-test-id="ad"]', (elements: HTMLAnchorElement[]) =>
+			const ads: Ad[] = await page.$$eval('article[data-test-id="ad"]', (elements: HTMLElement[]) =>
 				elements.map((element) => {
 					const img = element.querySelector('div[data-test-id="image"]')?.querySelector('picture img');
 					const title = element.querySelector('h2');
@@ -29,7 +29,7 @@ export class LbcTrackerProvider implements ITrackerProvider {
 					const location = element.querySelector("p[aria-label*='Située à']");
 
 					return {
-						url: element.getAttribute('href'),
+						url: element.children[0] ? element.children[0].getAttribute('href') : null,
 						title: title ? title.innerText.trim() : undefined,
 						img: img ? (img.getAttribute('src') as string) : undefined,
 						price: price ? (price.textContent?.trim() as string) : undefined,
