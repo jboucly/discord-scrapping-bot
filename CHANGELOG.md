@@ -75,3 +75,9 @@ Total overhaul of commands : `/daily` and `/mission`
 - Updated project dependencies and fixed security vulnerabilities.
 - Updated documentation.
 - Updated deprecated elements.
+
+## 1.0.1
+
+### Bug Fixes
+
+- Bug fix on the LBC tracker which no longer worked following a change to the DOM on the site in question
