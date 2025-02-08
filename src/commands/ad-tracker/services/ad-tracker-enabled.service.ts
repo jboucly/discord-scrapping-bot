@@ -18,7 +18,7 @@ export class AdTrackerEnabledService implements ICommand {
 
 		const alreadyExist = await prismaClient.adTrackers.findFirst({
 			where: {
-				channelId,
+				name,
 				userId: this.interaction.user.id
 			}
 		});

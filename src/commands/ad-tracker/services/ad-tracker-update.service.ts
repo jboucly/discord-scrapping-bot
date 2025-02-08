@@ -20,7 +20,6 @@ export class AdTrackerUpdateService implements ICommand {
 	private adToUpdate: AdTrackers;
 
 	private readonly modalInputId = {
-		name: 'nameInput',
 		url: 'urlInput'
 	};
 
@@ -102,14 +101,6 @@ export class AdTrackerUpdateService implements ICommand {
 
 		const modal = new ModalBuilder().setCustomId(this.modalId).setTitle('Update ad tracker notification !');
 
-		const adTrackerNameInput = new TextInputBuilder()
-			.setCustomId(this.modalInputId.name)
-			.setLabel('Set name of your notification')
-			.setValue(this.adToUpdate.name)
-			.setRequired(true)
-			.setPlaceholder('My ad tracker')
-			.setStyle(TextInputStyle.Short);
-
 		const adTrackerUrlInput = new TextInputBuilder()
 			.setCustomId(this.modalInputId.url)
 			.setLabel('Set url of your notification')
@@ -118,10 +109,9 @@ export class AdTrackerUpdateService implements ICommand {
 			.setPlaceholder('https://www.leboncoin.fr')
 			.setStyle(TextInputStyle.Short);
 
-		const actionRow1 = new ActionRowBuilder<TextInputBuilder>().addComponents(adTrackerNameInput);
-		const actionRow2 = new ActionRowBuilder<TextInputBuilder>().addComponents(adTrackerUrlInput);
+		const actionRow1 = new ActionRowBuilder<TextInputBuilder>().addComponents(adTrackerUrlInput);
 
-		modal.addComponents(actionRow1, actionRow2);
+		modal.addComponents(actionRow1);
 
 		return modal;
 	}
@@ -133,7 +123,6 @@ export class AdTrackerUpdateService implements ICommand {
 			time: 60000
 		});
 
-		const name = modalInteraction.fields.getTextInputValue(this.modalInputId.name);
 		const url = modalInteraction.fields.getTextInputValue(this.modalInputId.url);
 
 		if (!CheckUrlAdTrackerUtil(url, this.adToUpdate.type)) {
@@ -147,7 +136,7 @@ export class AdTrackerUpdateService implements ICommand {
 				where: {
 					id: this.adToUpdate.id
 				},
-				data: { name, url }
+				data: { url }
 			});
 
 			await modalInteraction.reply({
