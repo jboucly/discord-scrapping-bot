@@ -1,3 +1,6 @@
+/**
+ * Script test to scrap ouest-france website
+ */
 import puppeteer from 'puppeteer-extra';
 import AdblockerPlugin from 'puppeteer-extra-plugin-adblocker';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';

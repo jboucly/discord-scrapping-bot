@@ -6,11 +6,13 @@ import { format } from 'date-fns';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { isNil } from 'lodash';
 import { Ad } from '../types/ad.type';
+import { ImmoNotaryProvider } from './providers/immo-notary.provider';
 import { LbcTrackerProvider } from './providers/lbc-tracker.provider';
 import { OuestfranceImmoTrackerProvider } from './providers/ouestfrance-immo-tracker.provider';
 
 export class AdTrackerCommandEvent implements IEvent {
 	private lbcTrackerProvider = new LbcTrackerProvider();
+	private immoNotaryProvider = new ImmoNotaryProvider();
 	private ouestfranceImmoTrackerProvider = new OuestfranceImmoTrackerProvider();
 
 	public async startCronJobs(client: Client): Promise<void> {
@@ -49,8 +51,8 @@ export class AdTrackerCommandEvent implements IEvent {
 				});
 
 				if (!treatyAd) {
-					await this.saveTreatyAds(ad, adTracker.id);
 					const embedMessage = this.createEmbeds(ad, adTracker.type);
+					await this.saveTreatyAds(ad, adTracker.id);
 
 					await channel.send({
 						embeds: [embedMessage],
@@ -78,6 +80,8 @@ export class AdTrackerCommandEvent implements IEvent {
 				return await this.lbcTrackerProvider.getAds(adTracker);
 			case 'OUEST_FRANCE_IMMO':
 				return await this.ouestfranceImmoTrackerProvider.getAds(adTracker);
+			case 'IMMOBILIER_NOTAIRE':
+				return await this.immoNotaryProvider.getAds(adTracker);
 
 			default:
 				throw new Error('[ADS TRACKER EVENT] - Type not found');
@@ -133,6 +137,8 @@ export class AdTrackerCommandEvent implements IEvent {
 				return `https://www.leboncoin.fr${url}`;
 			case 'OUEST_FRANCE_IMMO':
 				return `https://www.ouestfrance-immo.com/${url}`;
+			case 'IMMOBILIER_NOTAIRE':
+				return url as string;
 			default:
 				throw new Error('[ADS TRACKER EVENT] - Type not found for set url');
 		}

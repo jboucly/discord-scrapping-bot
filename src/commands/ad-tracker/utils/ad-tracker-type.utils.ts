@@ -15,6 +15,11 @@ export const GetAdTrackerTypeChoice = (): APIApplicationCommandOptionChoice<stri
 					value,
 					name: 'OuestFrance Immo'
 				};
+			case AdTrackerTypeEnum.IMMOBILIER_NOTAIRE:
+				return {
+					value,
+					name: 'Immobilier Notaire'
+				};
 
 			default:
 				throw new Error('Invalid ad tracker type');
@@ -28,6 +33,8 @@ export const getAdTrackerTypeTranslated = (type: AdTrackerType | AdTrackerTypeEn
 			return 'LeBonCoin';
 		case AdTrackerTypeEnum.OUEST_FRANCE_IMMO:
 			return 'OuestFrance Immo';
+		case AdTrackerTypeEnum.IMMOBILIER_NOTAIRE:
+			return 'Immobilier Notaire';
 
 		default:
 			throw new Error('Invalid ad tracker type');

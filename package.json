@@ -1,9 +1,9 @@
 {
-	"name": "discord-daily-bot",
+	"name": "discord-scrapping-bot",
 	"version": "1.0.0",
-	"description": "Discord bot for weekly daily",
+	"description": "Discord bot for scrapping websites",
 	"main": "dist/index.js",
-	"repository": "git@github.com:jboucly/discord-daily-bot.git",
+	"repository": "git@github.com:jboucly/discord-scrapping-bot.git",
 	"author": "jboucly <julien.boucly@outlook.com>",
 	"license": "MIT",
 	"engines": {

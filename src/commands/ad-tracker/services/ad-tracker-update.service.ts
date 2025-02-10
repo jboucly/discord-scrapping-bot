@@ -49,7 +49,7 @@ export class AdTrackerUpdateService implements ICommand {
 					new StringSelectMenuOptionBuilder()
 						.setLabel(`Name : ${adTracker.name}`)
 						.setDescription(
-							`Type : ${adTracker.type} |  Url : ${adTracker.url.length > 100 ? adTracker.url.slice(0, 70) + '...' : adTracker.url}`
+							`Type : ${adTracker.type} |  Url : ${adTracker.url.length > 100 ? adTracker.url.slice(0, 50) + '...' : adTracker.url}`
 						)
 						.setEmoji('🏠')
 						.setValue(`${adTracker.id}`)
