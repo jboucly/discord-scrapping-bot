@@ -5,17 +5,9 @@
 import puppeteer from 'puppeteer-extra';
 import AdblockerPlugin from 'puppeteer-extra-plugin-adblocker';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { Ad } from './types/ad.type';
 import { autoScroll } from './utils/autoscroll.utils';
 import { sleep } from './utils/sleep.utils';
-
-type Ad = {
-	url: string | null;
-	title?: string;
-	img?: string;
-	price?: string;
-	pricePerM2?: string;
-	location?: string;
-};
 
 puppeteer.use(StealthPlugin());
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
