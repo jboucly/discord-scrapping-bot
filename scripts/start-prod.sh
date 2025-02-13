@@ -18,4 +18,4 @@ yarn deploy
 yarn db:deploy
 
 # Restart server
-docker run -d --name discord-bot-prd --env-file .env.prd --add-host=host.docker.internal:host-gateway discord-bot
+docker run --restart=always -d --name discord-bot-prd --env-file .env.prd --add-host=host.docker.internal:host-gateway discord-bot
