@@ -105,3 +105,4 @@ dist
 .tern-port
 
 volumes/
+scripts/scrapping/output/

@@ -9,20 +9,31 @@ export const autoScroll = async (page: Page, opts: { up: boolean } = { up: false
 			const distance = 100;
 
 			if (up) {
-				window.scrollTo(0, document.body.scrollHeight);
-				resolve(null);
+				const scrollStep = -window.scrollY / 50;
+				const interval = setInterval(() => {
+					const scrollHeight = document.body.scrollHeight;
+					totalHeight += distance;
+
+					if (window.scrollY <= 0) {
+						clearInterval(interval);
+						resolve(null);
+					}
+					window.scrollBy(0, scrollStep);
+					console.info(`ℹ️ --- Scrolling... ${totalHeight}/${scrollHeight}`);
+				}, 100);
 			} else {
 				const timer = setInterval(() => {
 					const scrollHeight = document.body.scrollHeight;
+
 					window.scrollBy(0, distance);
 					totalHeight += distance;
-					console.log(`Scrolling... ${totalHeight}/${scrollHeight}`);
+					console.info(`ℹ️ --- Scrolling... ${totalHeight}/${scrollHeight}`);
 
 					if (totalHeight >= scrollHeight - window.innerHeight) {
 						clearInterval(timer);
 						resolve(null);
 					}
-				}, 300);
+				}, 100);
 			}
 		});
 	}, up);
