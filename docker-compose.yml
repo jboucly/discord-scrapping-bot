@@ -4,7 +4,7 @@ networks:
 services:
     postgresql:
         container_name: postgresql
-        image: postgres:14
+        image: postgres:15
         ports:
             - 5455:5432
         env_file:
