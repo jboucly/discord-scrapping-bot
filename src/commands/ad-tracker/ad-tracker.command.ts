@@ -23,14 +23,14 @@ export default {
 						.addChannelTypes(ChannelType.GuildText)
 				)
 				.addStringOption((opts) =>
-					opts.setName(AdTrackerOption.URL).setDescription('Set channel to send all ads').setRequired(true)
-				)
-				.addStringOption((opts) =>
 					opts
 						.setName(AdTrackerOption.TYPE)
 						.setDescription('Set website for your search')
 						.setRequired(true)
 						.setChoices(GetAdTrackerTypeChoice())
+				)
+				.addStringOption((opts) =>
+					opts.setName(AdTrackerOption.URL).setDescription('Set channel to send all ads').setRequired(false)
 				)
 		)
 		.addSubcommand((subcommand) =>
