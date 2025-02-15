@@ -6,6 +6,7 @@ import { AdTrackers, AdTrackerType } from '@prisma/client';
 import { CacheType, ChatInputCommandInteraction, CommandInteractionOption } from 'discord.js';
 import { isNil } from 'lodash';
 import { AdTrackerOption } from '../enums/ad-tracker-option.enum';
+import { CheckMotorImmoLocalStorageQuery } from '../utils/ad-tracker-json-moteur-immo.utils';
 import { constructMotorImmoModal } from '../utils/ad-tracker-modal.utils';
 import { CheckUrlAdTrackerUtil } from '../utils/check-url-ad-tracker.util';
 
@@ -83,6 +84,16 @@ export class AdTrackerEnabledService implements ICommand {
 		});
 
 		const query = modalInteraction.fields.getTextInputValue('adTrackerJSON');
+
+		if (!CheckMotorImmoLocalStorageQuery(query)) {
+			await modalInteraction.reply({
+				flags: 'Ephemeral',
+				withResponse: true,
+				content:
+					'❌ Query not valid for this type of ad tracker. Please check the query and try again. ⚠️ Select only classic search ⚠️'
+			});
+			return;
+		}
 
 		await this.adTrackerRepository.saveOrUpdateAdTrackerMotorImmo(
 			{

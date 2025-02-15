@@ -15,6 +15,7 @@ import {
 	TextInputBuilder,
 	TextInputStyle
 } from 'discord.js';
+import { CheckMotorImmoLocalStorageQuery } from '../utils/ad-tracker-json-moteur-immo.utils';
 import { constructMotorImmoModal } from '../utils/ad-tracker-modal.utils';
 import { CheckUrlAdTrackerUtil } from '../utils/check-url-ad-tracker.util';
 
@@ -134,6 +135,16 @@ export class AdTrackerUpdateService implements ICommand {
 		});
 
 		const query = modalInteraction.fields.getTextInputValue('adTrackerJSON');
+
+		if (!CheckMotorImmoLocalStorageQuery(query)) {
+			await modalInteraction.reply({
+				flags: 'Ephemeral',
+				withResponse: true,
+				content:
+					'❌ Query not valid for this type of ad tracker. Please check the query and try again. ⚠️ Select only classic search ⚠️'
+			});
+			return;
+		}
 
 		try {
 			await this.adTrackerLocalStorageRepository.updateExisting(this.adToUpdate.id, {
