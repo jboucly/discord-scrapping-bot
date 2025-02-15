@@ -28,7 +28,7 @@
 		"db:migrate:dev": "prisma migrate dev"
 	},
 	"dependencies": {
-		"@prisma/client": "6.1.0",
+		"@prisma/client": "6.3.1",
 		"cron": "^3.5.0",
 		"cronstrue": "^2.54.0",
 		"date-fns": "^4.1.0",
