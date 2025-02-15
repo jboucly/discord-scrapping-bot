@@ -1,6 +1,8 @@
 import { AdTrackerType } from '@prisma/client';
 
-export const CheckUrlAdTrackerUtil = (url: string, type: AdTrackerType): boolean => {
+export const CheckUrlAdTrackerUtil = (url: string | undefined, type: AdTrackerType): boolean => {
+	if (!url) return false;
+
 	switch (type) {
 		case AdTrackerType.LBC:
 			return url.includes('https://www.leboncoin.fr/');
