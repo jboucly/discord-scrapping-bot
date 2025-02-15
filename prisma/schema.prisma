@@ -50,7 +50,7 @@ model AdTrackers {
     id        Int           @id @default(autoincrement())
     createdAt DateTime      @default(now()) @db.Timestamptz(6)
     updatedAt DateTime      @updatedAt @db.Timestamptz(6)
-    url       String        @unique @db.VarChar(255)
+    url       String        @db.VarChar(255)
     name      String        @db.VarChar(255)
     channelId String        @db.VarChar(255)
     userId    String        @db.VarChar(255)
