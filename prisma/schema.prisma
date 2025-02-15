@@ -47,15 +47,16 @@ model Daily {
 }
 
 model AdTrackers {
-    id                    Int                     @id @default(autoincrement())
-    createdAt             DateTime                @default(now()) @db.Timestamptz(6)
-    updatedAt             DateTime                @updatedAt @db.Timestamptz(6)
-    url                   String                  @unique @db.VarChar(255)
-    name                  String                  @db.VarChar(255)
-    channelId             String                  @db.VarChar(255)
-    userId                String                  @db.VarChar(255)
-    type                  AdTrackerType
-    AdTrackerLocalStorage AdTrackerLocalStorage[]
+    id        Int           @id @default(autoincrement())
+    createdAt DateTime      @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime      @updatedAt @db.Timestamptz(6)
+    url       String        @unique @db.VarChar(255)
+    name      String        @db.VarChar(255)
+    channelId String        @db.VarChar(255)
+    userId    String        @db.VarChar(255)
+    type      AdTrackerType
+
+    AdTrackerLocalStorage AdTrackerLocalStorage?
     TreatyAdTracker       TreatyAdTracker[]
 }
 
@@ -65,7 +66,7 @@ model AdTrackerLocalStorage {
     updatedAt   DateTime @updatedAt @db.Timestamptz(6)
     key         String   @db.VarChar(255)
     value       String   @db.Text
-    adTrackerId Int
+    adTrackerId Int      @unique
 
     AdTrackers AdTrackers @relation(fields: [adTrackerId], references: [id], onDelete: Cascade)
 }
