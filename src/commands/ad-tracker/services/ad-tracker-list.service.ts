@@ -1,11 +1,12 @@
 import { ICommand } from '@common/interfaces/command.interface';
-import { AdTrackers, PrismaClient } from '@prisma/client';
+import { AdTrackerRepository } from '@common/repositories/adTracker.repository';
+import { AdTrackers } from '@prisma/client';
 import { ChatInputCommandInteraction, Client, EmbedBuilder } from 'discord.js';
 import { isNil } from 'lodash';
 import { getAdTrackerTypeTranslated } from '../utils/ad-tracker-type.utils';
 
 export class AdTrackerListService implements ICommand {
-	private readonly prismaClient = new PrismaClient();
+	private readonly adTrackerRepository = new AdTrackerRepository();
 
 	constructor(
 		private readonly client: Client,
@@ -13,9 +14,7 @@ export class AdTrackerListService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const alreadyExist = await this.prismaClient.adTrackers.findMany({
-			where: { userId: this.interaction.user.id }
-		});
+		const alreadyExist = await this.adTrackerRepository.findMany({ userId: this.interaction.user.id });
 
 		if (isNil(alreadyExist) || alreadyExist.length === 0) {
 			await this.interaction.reply({

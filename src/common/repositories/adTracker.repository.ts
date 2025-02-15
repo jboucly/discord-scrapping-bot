@@ -1,8 +1,17 @@
 import { prismaClient } from '@common/clients/prisma.client';
-import { AdTrackers, AdTrackerType } from '@prisma/client';
+import { AdTrackerLocalStorage, AdTrackers, AdTrackerType, Prisma } from '@prisma/client';
 
 export class AdTrackerRepository {
-	public async delete(adTrackerIdToRemove: number) {
+	public findMany(
+		where: Prisma.AdTrackersWhereInput
+	): Promise<(AdTrackers & { AdTrackerLocalStorage: AdTrackerLocalStorage[] })[]> {
+		return prismaClient.adTrackers.findMany({
+			where,
+			include: { AdTrackerLocalStorage: true }
+		});
+	}
+
+	public async delete(adTrackerIdToRemove: number): Promise<void> {
 		await prismaClient.adTrackers.deleteMany({
 			where: {
 				id: adTrackerIdToRemove
