@@ -4,7 +4,7 @@ import { AdTrackerLocalStorage, AdTrackers, AdTrackerType, Prisma } from '@prism
 export class AdTrackerRepository {
 	public findMany(
 		where: Prisma.AdTrackersWhereInput
-	): Promise<(AdTrackers & { AdTrackerLocalStorage: AdTrackerLocalStorage[] })[]> {
+	): Promise<(AdTrackers & { AdTrackerLocalStorage: AdTrackerLocalStorage | null })[]> {
 		return prismaClient.adTrackers.findMany({
 			where,
 			include: { AdTrackerLocalStorage: true }
@@ -34,9 +34,10 @@ export class AdTrackerRepository {
 				id: adTracker.id ?? 0
 			},
 			update: {
+				url: adTracker.url as string,
 				channelId: adTracker.channelId as string,
 				AdTrackerLocalStorage: {
-					deleteMany: {
+					delete: {
 						adTrackerId: adTracker.id
 					},
 					create: {

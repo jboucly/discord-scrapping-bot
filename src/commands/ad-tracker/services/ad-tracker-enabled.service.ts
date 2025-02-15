@@ -3,17 +3,10 @@ import { ICommand } from '@common/interfaces/command.interface';
 import { AdTrackerRepository } from '@common/repositories/adTracker.repository';
 import { isValidHttpUrl } from '@common/utils/string.utils';
 import { AdTrackers, AdTrackerType } from '@prisma/client';
-import {
-	ActionRowBuilder,
-	CacheType,
-	ChatInputCommandInteraction,
-	CommandInteractionOption,
-	ModalBuilder,
-	TextInputBuilder,
-	TextInputStyle
-} from 'discord.js';
+import { CacheType, ChatInputCommandInteraction, CommandInteractionOption } from 'discord.js';
 import { isNil } from 'lodash';
 import { AdTrackerOption } from '../enums/ad-tracker-option.enum';
+import { constructMotorImmoModal } from '../utils/ad-tracker-modal.utils';
 import { CheckUrlAdTrackerUtil } from '../utils/check-url-ad-tracker.util';
 
 export class AdTrackerEnabledService implements ICommand {
@@ -78,8 +71,11 @@ export class AdTrackerEnabledService implements ICommand {
 	}
 
 	private async launchLogicToSaveMotorsImmo(name: string, channelId: string, adTrackerExist: AdTrackers | undefined) {
-		const modal = this.constructMotorImmoModal();
+		this.modalId = `adTrackerMotorImmoModal-${this.interaction.user.id}`;
+
+		const modal = constructMotorImmoModal(this.modalId);
 		await this.interaction.showModal(modal);
+
 		const modalInteraction = await this.interaction.awaitModalSubmit({
 			filter: (interaction) =>
 				interaction.customId === this.modalId && interaction.user.id === this.interaction.user.id,
@@ -105,24 +101,5 @@ export class AdTrackerEnabledService implements ICommand {
 			withResponse: true,
 			content: '🚀 Ad tracker saved'
 		});
-	}
-
-	private constructMotorImmoModal(): ModalBuilder {
-		this.modalId = `adTrackerMotorImmoModal-${this.interaction.user.id}`;
-
-		const modal = new ModalBuilder()
-			.setCustomId(this.modalId)
-			.setTitle('Set config to search ads on "Moteur Immo"');
-
-		const adTrackerJSONInput = new TextInputBuilder()
-			.setCustomId('adTrackerJSON')
-			.setLabel('Set JSON config to search ads (key : query)')
-			.setRequired(true)
-			.setPlaceholder('{"searchType":"classic"...}')
-			.setStyle(TextInputStyle.Paragraph);
-
-		modal.addComponents(new ActionRowBuilder<TextInputBuilder>().addComponents(adTrackerJSONInput));
-
-		return modal;
 	}
 }

@@ -1,6 +1,8 @@
 import { prismaClient } from '@common/clients/prisma.client';
 import { ICommand } from '@common/interfaces/command.interface';
-import { AdTrackers } from '@prisma/client';
+import { AdTrackerRepository } from '@common/repositories/adTracker.repository';
+import { AdTrackerLocalStorageRepository } from '@common/repositories/adTrackerLocalStorage.repository';
+import { AdTrackers, AdTrackerType } from '@prisma/client';
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
@@ -13,12 +15,15 @@ import {
 	TextInputBuilder,
 	TextInputStyle
 } from 'discord.js';
+import { constructMotorImmoModal } from '../utils/ad-tracker-modal.utils';
 import { CheckUrlAdTrackerUtil } from '../utils/check-url-ad-tracker.util';
 
 export class AdTrackerUpdateService implements ICommand {
 	private modalId: string;
 	private adToUpdate: AdTrackers;
 
+	private readonly adTrackerRepository = new AdTrackerRepository();
+	private readonly adTrackerLocalStorageRepository = new AdTrackerLocalStorageRepository();
 	private readonly modalInputId = {
 		url: 'urlInput'
 	};
@@ -29,9 +34,7 @@ export class AdTrackerUpdateService implements ICommand {
 	) {}
 
 	public async execute(): Promise<void> {
-		const allAdTrackerSaved = await prismaClient.adTrackers.findMany({
-			where: { userId: this.interaction.user.id }
-		});
+		const allAdTrackerSaved = await this.adTrackerRepository.findMany({ userId: this.interaction.user.id });
 
 		if (allAdTrackerSaved.length === 0) {
 			await this.interaction.reply({
@@ -75,18 +78,24 @@ export class AdTrackerUpdateService implements ICommand {
 
 		try {
 			const adTrackerIdToUpdate = Number(selectMenuInteraction.values[0]);
-			const adTrackerToUpdate = await prismaClient.adTrackers.findUnique({
-				where: {
-					id: adTrackerIdToUpdate
-				}
-			});
+			const adTrackerToUpdate = await prismaClient.adTrackers.findUnique({ where: { id: adTrackerIdToUpdate } });
 
 			if (!adTrackerToUpdate) throw new Error('Ad tracker not found');
 			this.adToUpdate = adTrackerToUpdate;
 
-			const modal = this.constructModal();
-			await selectMenuInteraction.showModal(modal);
-			await this.setModalSubmitEvent();
+			if (this.adToUpdate.type === AdTrackerType.MOTEUR_IMMO) {
+				this.modalId = `adTrackerMotorImmoModal-${this.interaction.user.id}`;
+
+				const modal = constructMotorImmoModal(this.modalId);
+				await selectMenuInteraction.showModal(modal);
+				await this.setModalMotorImmoSubmitEvent();
+			} else {
+				this.modalId = `updateUrlModal-${this.interaction.user.id}`;
+
+				const modal = this.constructUrlModal();
+				await selectMenuInteraction.showModal(modal);
+				await this.setModalUrlSubmitEvent();
+			}
 		} catch (e) {
 			await selectMenuInteraction.update({
 				content: 'Error while updating ad tracker',
@@ -96,9 +105,10 @@ export class AdTrackerUpdateService implements ICommand {
 		}
 	}
 
-	private constructModal(): ModalBuilder {
-		this.modalId = `updateMissionModal-${this.interaction.user.id}`;
-
+	/**
+	 * @description Construct the modal to update the url of the ad tracker
+	 */
+	private constructUrlModal(): ModalBuilder {
 		const modal = new ModalBuilder().setCustomId(this.modalId).setTitle('Update ad tracker notification !');
 
 		const adTrackerUrlInput = new TextInputBuilder()
@@ -116,7 +126,32 @@ export class AdTrackerUpdateService implements ICommand {
 		return modal;
 	}
 
-	private async setModalSubmitEvent(): Promise<void> {
+	private async setModalMotorImmoSubmitEvent(): Promise<void> {
+		const modalInteraction = await this.interaction.awaitModalSubmit({
+			filter: (interaction) =>
+				interaction.customId === this.modalId && interaction.user.id === this.interaction.user.id,
+			time: 60000
+		});
+
+		const query = modalInteraction.fields.getTextInputValue('adTrackerJSON');
+
+		try {
+			await this.adTrackerLocalStorageRepository.updateExisting(this.adToUpdate.id, {
+				key: 'query',
+				value: query
+			});
+		} catch (error) {
+			throw new Error('Error while updating ad tracker, ad does not exist');
+		}
+
+		await modalInteraction.reply({
+			flags: 'Ephemeral',
+			withResponse: true,
+			content: '🚀 Ad tracker saved'
+		});
+	}
+
+	private async setModalUrlSubmitEvent(): Promise<void> {
 		const modalInteraction = await this.interaction.awaitModalSubmit({
 			filter: (interaction) =>
 				interaction.customId === this.modalId && interaction.user.id === this.interaction.user.id,
@@ -132,12 +167,7 @@ export class AdTrackerUpdateService implements ICommand {
 				content: '❌ Url not valid for this type of ad tracker. Please check the url and try again'
 			});
 		} else {
-			await prismaClient.adTrackers.update({
-				where: {
-					id: this.adToUpdate.id
-				},
-				data: { url }
-			});
+			await prismaClient.adTrackers.update({ where: { id: this.adToUpdate.id }, data: { url } });
 
 			await modalInteraction.reply({
 				flags: 'Ephemeral',
