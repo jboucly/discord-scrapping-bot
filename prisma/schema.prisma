@@ -89,4 +89,5 @@ enum AdTrackerType {
     LBC
     OUEST_FRANCE_IMMO
     IMMOBILIER_NOTAIRE
+    MOTEUR_IMMO
 }
