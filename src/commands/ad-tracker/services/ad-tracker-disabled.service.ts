@@ -1,5 +1,6 @@
 import { prismaClient } from '@common/clients/prisma.client';
 import { ICommand } from '@common/interfaces/command.interface';
+import { AdTrackerRepository } from '@common/repositories/adTracker.repository';
 import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
@@ -12,6 +13,8 @@ import {
 import { isNumber } from 'lodash';
 
 export class AdTrackerSearchDisabledService implements ICommand {
+	private readonly adTrackerRepository = new AdTrackerRepository();
+
 	constructor(
 		private readonly client: Client,
 		private readonly interaction: ChatInputCommandInteraction
@@ -65,11 +68,7 @@ export class AdTrackerSearchDisabledService implements ICommand {
 			const adTrackerIdToRemove = Number(confirmation.values[0]);
 
 			if (isNumber(adTrackerIdToRemove) && !isNaN(adTrackerIdToRemove)) {
-				await prismaClient.adTrackers.deleteMany({
-					where: {
-						id: adTrackerIdToRemove
-					}
-				});
+				await this.adTrackerRepository.delete(adTrackerIdToRemove);
 
 				await confirmation.update({
 					content: '🚀 Notification ad tracker removed',

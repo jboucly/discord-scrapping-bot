@@ -2,6 +2,14 @@ import { prismaClient } from '@common/clients/prisma.client';
 import { AdTrackers, AdTrackerType } from '@prisma/client';
 
 export class AdTrackerRepository {
+	public async delete(adTrackerIdToRemove: number) {
+		await prismaClient.adTrackers.deleteMany({
+			where: {
+				id: adTrackerIdToRemove
+			}
+		});
+	}
+
 	public findAdTrackerByUserIdAndName(userId: string, name: string) {
 		return prismaClient.adTrackers.findFirst({
 			where: {
