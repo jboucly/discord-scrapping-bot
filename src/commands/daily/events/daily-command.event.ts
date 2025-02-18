@@ -27,7 +27,7 @@ export class DailyCommandEvent implements IEvent {
 				cron.start();
 			});
 
-			console.info('\nℹ️  Daily Cron jobs started');
+			console.info('ℹ️  Daily Cron jobs started');
 		}
 	}
 }

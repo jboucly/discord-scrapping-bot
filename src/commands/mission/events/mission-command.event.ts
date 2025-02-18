@@ -21,7 +21,7 @@ export class MissionCommandEvent implements IEvent {
 		});
 
 		cron.start();
-		console.info('\nℹ️  Mission cron jobs started with crontab :', crontab, '\n');
+		console.info('ℹ️  Mission cron jobs started with crontab :', crontab);
 	}
 
 	public async sendMissionNotification(client: Client): Promise<void> {

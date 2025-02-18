@@ -24,7 +24,7 @@ export class AdTrackerCommandEvent implements IEvent {
 		});
 
 		cron.start();
-		console.info('\nℹ️  Ad Tracker cron jobs started with crontab :', crontab, '\n');
+		console.info('ℹ️  Ad Tracker cron jobs started with crontab :', crontab);
 	}
 
 	private async sendAdsNotifications(client: Client): Promise<void> {

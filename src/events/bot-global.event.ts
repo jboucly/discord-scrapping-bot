@@ -10,7 +10,7 @@ export class BotGlobalEvent {
 
 	private setEventOnRunBot(): void {
 		this.client.once(Events.ClientReady, async (c) => {
-			console.log(`--- Ready! Logged in as ${c.user.tag}`);
+			console.log(`ℹ️  Bot ready ! Logged in as ${c.user.tag}`);
 		});
 	}
 
